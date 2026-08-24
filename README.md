@@ -8,13 +8,13 @@ The project introduces a **“Generate Once, Synthesize Many”** approach. Inst
 
 The framework was developed and evaluated on **MVTec AD 2**, with the generated anomalies evaluated for their ability to support **threshold calibration in the absence of real defect samples**.
 
-**For the complete methodology, algorithms, experimental setup, results, and evaluation, see the [Project Report](docs/FLASH_Project_Report.pdf).**
+**For the complete methodology, algorithms, experimental setup, results, and evaluation, see the [Project Report](FLASH_%20A%20Reference-Free%20“Generate%20Once,%20Synthesize%20Many”%20Framework.pdf).**
 
 ---
 
 ## Project Report
 
-📄 [**Read the Complete Project Report**](docs/FLASH_Project_Report.pdf)
+📄 [**Read the Complete Project Report**](FLASH_%20A%20Reference-Free%20“Generate%20Once,%20Synthesize%20Many”%20Framework.pdf)
 
 The report contains the complete technical details of FLASH, including the five-stage architecture, DiffMask, OBS, MRSP, adaptive synthesis, experimental methodology, MVTec AD 2 evaluation, calibration gap analysis, and computational analysis.
 
@@ -22,9 +22,11 @@ The report contains the complete technical details of FLASH, including the five-
 
 ## Architecture
 
-📐 [**View the Five-Stage FLASH Architecture**](FLASH%20Architecture.png)
+![FLASH Architecture](FLASH%20Architecture.png)
 
-The FLASH framework consists of five stages that separate defect generation from large-scale anomaly synthesis.
+**Figure: Five-stage FLASH architecture for reference-free synthetic anomaly generation.**
+
+The FLASH framework separates expensive defect generation from scalable anomaly synthesis through five stages:
 
 ### Stage 1: Semantic-Guided Anomaly Generation
 
@@ -36,7 +38,7 @@ The normal image and generated anomaly image are processed by **DiffMask**. The 
 
 ### Stage 3: Defect Validation and Storage
 
-The extracted defect crop is passed to **VLM-2** for semantic validation. Valid defects are retained and stored in a **Category-wise Semantic Defect Bank**, making them reusable for generating multiple synthetic anomalies.
+The extracted defect crop is passed to **VLM-2** for semantic validation. Valid defects are retained and stored in a **Category-wise Semantic Defect Bank**, allowing the same generated defects to be reused across multiple normal images.
 
 ### Stage 4: Object-Aware Localization
 
