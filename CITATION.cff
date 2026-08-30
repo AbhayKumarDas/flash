@@ -21,7 +21,7 @@ keywords:
   - industrial inspection
   - defect synthesis
   - MVTec AD 2
-# The paper is under review, so no venue is listed. Update this block once it appears.
+# The paper is under review, so no venue is listed. 
 preferred-citation:
   type: manuscript
   title: "FLASH: A Generate Once, Synthesize Many Framework for Synthetic Anomaly Generation in Industrial Anomaly Detection"

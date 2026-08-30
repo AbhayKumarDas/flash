@@ -264,17 +264,6 @@ python tools/update_readme_tree.py --check    # fail if it is stale
 Git decides what appears, which means the tree and `.gitignore` cannot drift apart. The
 pre-commit hook runs `--check` on every commit.
 
-## Citation
-
-```bibtex
-@misc{flash,
-  title  = {FLASH: A Generate Once, Synthesize Many Framework for Synthetic
-            Anomaly Generation in Industrial Anomaly Detection},
-  author = {Das, Abhay Kumar},
-  year   = {2026},
-  note   = {Manuscript}
-}
-```
 
 ## License
 
