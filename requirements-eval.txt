@@ -1,0 +1,11 @@
+# The evaluation notebooks in evaluation/ only. Installs a full anomaly detection stack, which is
+# not needed to generate synthetic data.
+#
+# The SuperADD detector and its DINOv3 backbone are not on PyPI. The evaluation notebooks clone
+# and configure them at run time, so they are not listed here.
+
+-r requirements.txt
+
+anomalib>=1.0
+timm>=1.0
+scikit-learn>=1.3

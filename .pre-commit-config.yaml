@@ -1,0 +1,35 @@
+# Install once, then it runs on every commit:
+#     pip install pre-commit && pre-commit install
+#
+# Run it over everything already committed:
+#     pre-commit run --all-files
+
+repos:
+  # Notebook outputs are embedded base64 images, so committing them turns every rerun into a
+  # multi-megabyte diff and makes the repository slow to clone. nbstripout removes them at commit
+  # time; the notebooks themselves are still tracked.
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.7.1
+    hooks:
+      - id: nbstripout
+
+  # Keeps the directory tree at the bottom of README.md honest. It fails the commit when a file
+  # was added, removed or renamed without refreshing the block, and the fix is one command:
+  #     python tools/update_readme_tree.py
+  - repo: local
+    hooks:
+      - id: readme-tree
+        name: README directory tree is current
+        entry: python tools/update_readme_tree.py --check
+        language: system
+        pass_filenames: false
+        always_run: true
+
+# Linting and formatting are deliberately not hooked. Run them when you want them:
+#
+#     ruff check .          src/, tests/ and tools/ (notebooks are excluded, see pyproject.toml)
+#     ruff format .
+#
+# A formatter that rewrites files during a commit is the wrong place for it here, because most of
+# src/flash is a verbatim copy of the code the published results came from and should only change
+# deliberately.

@@ -1,0 +1,21 @@
+# Modules 1 to 3. Deliberately light: producing synthetic data must not require a detector stack.
+# See requirements-eval.txt for the evaluation notebooks.
+#
+# On Kaggle these are already present. Install this file when running anywhere else.
+#
+# Lower bounds, not pins. If you need byte-reproducibility, freeze your own resolved versions:
+#     pip freeze > requirements.lock.txt
+# Transformers in particular changed how it resolves image processors in v5; Module 2 handles
+# both, but a pinned version removes the question.
+
+numpy>=1.24
+opencv-python>=4.8
+scipy>=1.10
+torch>=2.0
+pillow>=10.0
+pandas>=2.0
+matplotlib>=3.7
+
+# Modules 1 and 2 only, for the vision-language model. Module 3 loads no model.
+transformers>=4.49
+accelerate>=0.30

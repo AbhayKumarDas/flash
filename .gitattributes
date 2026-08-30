@@ -1,0 +1,23 @@
+# ------------------------------------------------------------------ Git LFS
+# The module artifacts are shipped with the repository so results can be reproduced without
+# re-running the earlier modules. One of them is over GitHub's 100 MB limit for a normal file,
+# so they are stored with Git LFS, which allows up to 2 GB per object.
+#
+# Anyone cloning needs git-lfs installed, otherwise they get small pointer files instead of the
+# archives. See data/input/README.md.
+data/input/*.zip   filter=lfs diff=lfs merge=lfs -text
+data/output/*.zip  filter=lfs diff=lfs merge=lfs -text
+
+# ------------------------------------------------------------------ line endings
+# Normalise to LF in the repository. Without this a Windows checkout rewrites every file and the
+# notebook build check reports differences that are only carriage returns.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+*.zip binary
+
+# ------------------------------------------------------------------ github display
+# Notebooks dominate the language statistics and are not what the repository is written in.
+*.ipynb linguist-documentation
+tools/notebook_src/** linguist-generated=false

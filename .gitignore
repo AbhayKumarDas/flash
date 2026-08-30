@@ -1,0 +1,52 @@
+# ------------------------------------------------------------------ module artifacts
+# The module archives ARE tracked, through Git LFS (see .gitattributes). They ship with the
+# repository so a reader can reproduce a later module without running the earlier ones.
+#
+# Loose files produced by a run are not tracked. Only the archives are, plus the manifests.
+data/input/*
+data/output/*
+!data/input/README.md
+!data/output/README.md
+!data/input/General_Input.md
+!data/input/*.zip
+!data/output/*.zip
+!data/output/*.csv
+
+# ------------------------------------------------------------------ test artifacts
+# Written by tests/test_end_to_end.py. Override the location with FLASH_TEST_OUT.
+temp/
+
+# ------------------------------------------------------------------ python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.python-version
+
+# ------------------------------------------------------------------ notebooks
+.ipynb_checkpoints/
+# Notebook OUTPUTS are stripped by pre-commit, not ignored. The .ipynb files themselves are
+# tracked, and so are their source fragments in tools/notebook_src/.
+
+# ------------------------------------------------------------------ tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ------------------------------------------------------------------ editors and os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ------------------------------------------------------------------ published results
+# The combined SuperADD tables are part of the repository. This negation exists because a
+# parent checkout may carry a broad "results" ignore rule; deeper rules win.
+!evaluation/results/
+!evaluation/results/**

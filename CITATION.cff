@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: "FLASH: A Generate Once, Synthesize Many Framework for Synthetic Anomaly Generation in Industrial Anomaly Detection"
+abstract: >-
+  FLASH decouples defect generation from anomaly synthesis. A small set of defect instances is
+  generated once from defect-free images, validated, and banked; those defects are then reused to
+  compose a much larger anomaly corpus without invoking a generator again. Defect masks are
+  recovered from the generated images rather than prescribed in advance, so labels cannot drift
+  from the images they describe.
+message: "If you use this software or its results, please cite the paper."
+type: software
+authors:
+  - family-names: Das
+    given-names: Abhay Kumar
+repository-code: "https://github.com/AbhayKumarDas/flash"
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-08-30"
+keywords:
+  - anomaly detection
+  - synthetic data generation
+  - industrial inspection
+  - defect synthesis
+  - MVTec AD 2
+# The paper is under review, so no venue is listed. Update this block once it appears.
+preferred-citation:
+  type: manuscript
+  title: "FLASH: A Generate Once, Synthesize Many Framework for Synthetic Anomaly Generation in Industrial Anomaly Detection"
+  authors:
+    - family-names: Das
+      given-names: Abhay Kumar
+  year: 2026

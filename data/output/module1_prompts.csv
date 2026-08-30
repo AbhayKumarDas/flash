@@ -1,0 +1,169 @@
+﻿category,image,family,defect_name,size,target,defect,where,prompt,retries,gen_seconds
+can,Normal_can_172_regular.png,deformation,scratch tearing,very small,the can's label,tear exposing silver metal,on the holographic section,"Generate a natural-looking anomaly image of this scene: the can's label has a very small tear exposing silver metal, on the holographic section. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,10.18
+can,Normal_can_176_regular.png,scratch or cut,scratch fault,small,the aluminium soda can,scratch tearing through the printed label so the bare silver metal underneath shows,on its visible surface,"Generate a natural-looking anomaly image of this scene: the aluminium soda can has a small scratch tearing through the printed label so the bare silver metal underneath shows, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,30.53
+can,Normal_can_388_regular.png,print or coating defect,scratch fault,very small,the aluminium soda can,scratch tearing through the printed label so the bare silver metal underneath shows,on its visible surface,"Generate a natural-looking anomaly image of this scene: the aluminium soda can has a very small scratch tearing through the printed label so the bare silver metal underneath shows, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,32.77
+fabric,Normal_fabric_028_regular.png,stain or discolouration,thread pull,very small,the fabric near the center,pulled thread,in the middle,"Generate a natural-looking anomaly image of this scene: the fabric near the center has a very small pulled thread, in the middle. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,7.63
+fabric,Normal_fabric_128_regular.png,fibre or thread contamination,loose thread,small,the fabric near the center,thread pulled out of the weave,near its upper edge,"Generate a natural-looking anomaly image of this scene: the fabric near the center has a small thread pulled out of the weave, near its upper edge. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",1,16.41
+fabric,Normal_fabric_255_regular.png,scratch or cut,scratch across the weave,tiny,the fabric in the center,cut across the weave,near its middle,"Generate a natural-looking anomaly image of this scene: the fabric in the center has a tiny cut across the weave, near its middle. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,7.9
+fruit_jelly,Normal_fruit_jelly_079_regular.png,fibre or thread contamination,glass fault,tiny,the tub of solid set fruit jelly,glass shard pressed into the surface,on its visible surface,"Generate a natural-looking anomaly image of this scene: the tub of solid set fruit jelly has a tiny glass shard pressed into the surface, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,30.85
+fruit_jelly,Normal_fruit_jelly_115_regular.png,mould or rot,dark speck of debris,small,the sealed tub,pressed into the set jelly,on the surface near the red cherry,"Generate a natural-looking anomaly image of this scene: the sealed tub has a small pressed into the set jelly, on the surface near the red cherry. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",1,16.96
+fruit_jelly,Normal_fruit_jelly_150_regular.png,foreign body contamination,glass shard,very small,the sealed tub,pressed into the set jelly,on the surface near the fruit pieces,"Generate a natural-looking anomaly image of this scene: the sealed tub has a very small pressed into the set jelly, on the surface near the fruit pieces. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,8.13
+rice,Normal_rice_146_regular.png,stain or discolouration,clear fault,tiny,the white rice grains in bulk,clear plastic pellet among the grains,on its visible surface,"Generate a natural-looking anomaly image of this scene: the white rice grains in bulk has a tiny clear plastic pellet among the grains, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,32.8
+rice,Normal_rice_208_regular.png,foreign body contamination,clear fault,small,the white rice grains in bulk,clear plastic pellet among the grains,on its visible surface,"Generate a natural-looking anomaly image of this scene: the white rice grains in bulk has a small clear plastic pellet among the grains, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,33.98
+rice,Normal_rice_249_regular.png,fibre or thread contamination,clear fault,tiny,the white rice grains in bulk,clear plastic pellet among the grains,on its visible surface,"Generate a natural-looking anomaly image of this scene: the white rice grains in bulk has a tiny clear plastic pellet among the grains, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,32.95
+sheet_metal,Normal_sheet_metal_016_regular.png,foreign body contamination,metal shaving,very small,the sheet metal strip,curl of metal swarf,on the surface,"Generate a natural-looking anomaly image of this scene: the sheet metal strip has a very small curl of metal swarf, on the surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,12.37
+sheet_metal,Normal_sheet_metal_031_regular.png,scratch or cut,hole fault,very small,the flat strips of machined sheet metal,hole punched through the metal,on its visible surface,"Generate a natural-looking anomaly image of this scene: the flat strips of machined sheet metal has a very small hole punched through the metal, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,49.67
+sheet_metal,Normal_sheet_metal_074_regular.png,hole or tear,hole fault,very small,the flat strips of machined sheet metal,hole punched through the metal,on its visible surface,"Generate a natural-looking anomaly image of this scene: the flat strips of machined sheet metal has a very small hole punched through the metal, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,51.36
+vial,Normal_vial_065_regular.png,hole or tear,dark fault,very small,the glass vial of clear sparkling liquid,dark particle suspended in the liquid,on its visible surface,"Generate a natural-looking anomaly image of this scene: the glass vial of clear sparkling liquid has a very small dark particle suspended in the liquid, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,34.33
+vial,Normal_vial_145_regular.png,print or coating defect,scratch-through print,small,the QR label,scratched-through print,on the left side,"Generate a natural-looking anomaly image of this scene: the QR label has a small scratched-through print, on the left side. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,7.68
+vial,Normal_vial_280_regular.png,missing or broken part,dark fault,very small,the glass vial of clear sparkling liquid,dark particle suspended in the liquid,on its visible surface,"Generate a natural-looking anomaly image of this scene: the glass vial of clear sparkling liquid has a very small dark particle suspended in the liquid, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,32.87
+wallplugs,Normal_wallplugs_070_regular.png,missing or broken part,crack fault,small,the plastic wall plugs on a plain background,crack running down the shaft,on its visible surface,"Generate a natural-looking anomaly image of this scene: the plastic wall plugs on a plain background has a small crack running down the shaft, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,34.93
+wallplugs,Normal_wallplugs_126_regular.png,foreign body contamination,crack fault,very small,the plastic wall plugs on a plain background,crack running down the shaft,on its visible surface,"Generate a natural-looking anomaly image of this scene: the plastic wall plugs on a plain background has a very small crack running down the shaft, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,35.35
+wallplugs,Normal_wallplugs_243_regular.png,scratch or cut,crack fault,small,the plastic wall plugs on a plain background,crack running down the shaft,on its visible surface,"Generate a natural-looking anomaly image of this scene: the plastic wall plugs on a plain background has a small crack running down the shaft, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,34.89
+walnuts,Normal_walnuts_332_regular.png,crack or split,shell crack,tiny,the walnut bottom right,crack splitting the shell open,near its upper seam,"Generate a natural-looking anomaly image of this scene: the walnut bottom right has a tiny crack splitting the shell open, near its upper seam. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,7.88
+walnuts,Normal_walnuts_353_regular.png,mould or rot,broken fault,small,the whole walnuts in their shells on a plain background,broken shell showing the kernel inside,on its visible surface,"Generate a natural-looking anomaly image of this scene: the whole walnuts in their shells on a plain background has a small broken shell showing the kernel inside, on its visible surface. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",4,35.51
+walnuts,Normal_walnuts_398_regular.png,hole or tear,hole bored through the shell,very small,the walnut second from the left in the bottom row,bored hole exposing the kernel,near its lower seam,"Generate a natural-looking anomaly image of this scene: the walnut second from the left in the bottom row has a very small bored hole exposing the kernel, near its lower seam. The defect is part of the material, not laid on top -- its edges, depth and shadow follow the surface. Small, clearly visible, photorealistic.
+
+HARD RULES YOU MUST FOLLOW
+
+1. Exact Image Preservation: Preserve the original image, geometry, composition, background, texture, lighting, shadows, reflections, perspective, and pixel correspondence everywhere except the requested defect.
+2. Photometric & Dimensional Invariance: Preserve color, saturation, exposure, contrast, illumination, material appearance, image dimensions, aspect ratio, crop, framing, and resolution exactly; no resizing, cropping, padding, zooming, or global enhancement.
+3. Single Localized Defect: Add exactly ONE small, category-valid, physically realistic anomaly; no reconstruction, recomposition, secondary defects, or any unrequested modification.",0,8.72
