@@ -9,9 +9,9 @@ abstract: >-
 message: "If you use this software or its results, please cite the paper."
 type: software
 authors:
-  - family-names: Das
-    given-names: Abhay Kumar
-repository-code: "https://github.com/AbhayKumarDas/flash"
+  - family-names: null
+    given-names: null
+repository-code: ""
 license: Apache-2.0
 version: 0.1.0
 date-released: "2026-08-30"
