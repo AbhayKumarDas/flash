@@ -296,14 +296,21 @@ flash/
 |   |   |-- 01_semantic_generation.md
 |   |   |-- 02_extraction_and_banking.md
 |   |   `-- 03_localisation_and_synthesis.md
-|   |-- paper/    # the paper
-|   |   |-- FLASH.pdf
-|   |   `-- README.md
-|   `-- reports/
-|       `-- FLASH_ A Reference-Free “Generate Once, Synthesize Many” Framework.pdf
+|   `-- paper/    # the paper
+|       |-- FLASH.pdf
+|       `-- README.md
 |-- evaluation/    # detector-side calibration study
+|   |-- harness/
+|   |   |-- __init__.py
+|   |   |-- harness.py
+|   |   |-- paper_accuracy_results.md
+|   |   |-- README.md
+|   |   |-- run_one.py
+|   |   |-- sweep.py
+|   |   `-- tiled_harness.py
 |   |-- results/
-|   |   `-- combined_results_8_categories.txt
+|   |   |-- combined_results_8_categories.txt
+|   |   `-- paper_table1_results.csv
 |   |-- flash_part1.ipynb
 |   `-- flash_part2.ipynb
 |-- notebooks/    # the pipeline, run in order
