@@ -1,11 +1,9 @@
 # Copyright (C) 2020-2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Enumerate and schedule the paper's calibration comparisons across GPUs.
+"""Schedule the paper's calibration comparisons across GPUs.
 
-Completed jobs are skipped, so a comparison can be resumed after interruption. Each
-job trains one detector once and evaluates the Real, Perlin, FLASH, and/or AnoStyler
-calibration settings from the same fitted model.
+Completed jobs are skipped and results are aggregated into CSV.
 
 Usage:
     python -m evaluation.harness.sweep --experiment cross_model_comparison --gpus 0 1

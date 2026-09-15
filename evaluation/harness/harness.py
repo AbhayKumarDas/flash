@@ -1,16 +1,9 @@
 # Copyright (C) 2020-2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Core harness for the synthetic-anomaly calibration experiments.
+"""Core harness for synthetic-anomaly threshold calibration.
 
-A single job trains one model **once** on all train normals and then derives every
-evaluation setting from that identical model, so settings differ only in the threshold
-calibration source (never in the underlying weights).
-
-The reported settings follow the paper: Real calibration is the oracle reference, while
-Perlin, FLASH, and AnoStyler use held-out normals plus synthetic anomalies to calibrate a
-threshold that is then transferred to the real test set. An optional synthetic-set
-diagnostic evaluates that same threshold on its calibration data.
+Each job fits one detector, then evaluates Real, Perlin, FLASH, and AnoStyler calibration.
 """
 
 from __future__ import annotations
@@ -44,12 +37,7 @@ EVAL_DATA_ROOT = Path(os.environ.get("FLASH_EVAL_DATA_ROOT", "./data/evaluation"
 BinaryPrecisionMetric = create_anomalib_metric(BinaryPrecision)
 BinaryRecallMetric = create_anomalib_metric(BinaryRecall)
 
-# ``create_anomalib_metric`` builds the class with ``type()``, so ``__module__``
-# resolves to ``abc`` and pickle cannot find it again -- which makes checkpointing fail
-# for any dynamically created metric. Repoint the identity at this module (using the
-# original torchmetrics class names, so the reported column stays ``image_BinaryPrecision``
-# / ``image_BinaryRecall`` and matches the reported output schema) so the classes are
-# importable by their bound names.
+# Make dynamic metrics importable for checkpointing and keep their output names.
 for _name, _cls in (("BinaryPrecision", BinaryPrecisionMetric), ("BinaryRecall", BinaryRecallMetric)):
     _cls.__name__ = _cls.__qualname__ = _name
     _cls.__module__ = __name__
@@ -58,7 +46,7 @@ globals()["BinaryRecall"] = BinaryRecallMetric
 Precision = BinaryPrecisionMetric
 Recall = BinaryRecallMetric
 
-# Dataset registry: name -> (datamodule class, root, categories).
+# Dataset registry: name -> (class, root, categories).
 MVTEC_CATEGORIES = [
     "bottle", "cable", "capsule", "carpet", "grid", "hazelnut", "leather",
     "metal_nut", "pill", "screw", "tile", "toothbrush", "transistor", "wood", "zipper",
@@ -76,25 +64,17 @@ DATASETS = {
     "mvtec2": (MVTecAD2, EVAL_DATA_ROOT / "MVTec_AD_2", MVTEC2_CATEGORIES),
 }
 
-# Input resolution per dataset. MVTec AD 2 ships 2.3-5.0 MP images with non-uniform
-# aspect ratios, so it must be resized explicitly or the models run out of memory.
+# MVTec AD 2 uses explicit 448x448 inputs.
 RESOLUTIONS: dict[str, tuple[int, int] | None] = {
     "mvtec": None,
     "visa": None,
     "mvtec2": (448, 448),
 }
 
-# The paper reproduction path uses the stock anomalib Perlin baseline for live synthesis.
+# Live synthetic baseline.
 PIPELINES = {"Perlin": None}
 
-# Pre-generated synthetic-anomaly sources read already-rendered (image, mask) pairs.
-# They are produced once by the generation notebook, which cuts real defect patches from
-# a small donor bank and replays them onto held-out train/good hosts at MRSP/OBS-chosen
-# sites (see that notebook's own docs for the full method). See
-# ``_pregenerated_eval_set`` for how these are turned into an evaluable dataset.
-#
-# As of the 2026-08-25 regeneration (`flash-part1.ipynb`), the on-disk directories use
-# `hybrid` for FLASH and `anostyler` for AnoStyler.
+# Pre-generated calibration sources.
 PREGENERATED_PIPELINES = {"FLASH": "hybrid", "AnoStyler": "anostyler"}
 CALIBRATION_SOURCES = {
     "-": "Real",
@@ -105,25 +85,14 @@ CALIBRATION_SOURCES = {
 CALIBRATION_PIPELINES = {
     source: source for source in CALIBRATION_SOURCES.values() if source != "Real"
 }
-# The generation notebook regenerated SynthetciGenMVAD2 in place with a
-# donor bank covering all 8 MVTec AD 2 categories (was 4: rice/walnuts/wallplugs/
-# fruit_jelly, from the earlier `semantic_bank_blend.ipynb` pipeline) -- 3 donor pairs
-# per category, 24 pairs total. Verified live against the 4 newly-covered categories
-# (can, fabric, sheet_metal, vial): counts match each category's real test_public/bad
-# count exactly, same as before.
+# Categories covered by the pre-generated sets.
 PREGENERATED_CATEGORIES = (
     "can", "fabric", "fruit_jelly", "rice", "sheet_metal", "vial", "wallplugs", "walnuts",
 )
 SYNTHETIC_GEN_ROOT = EVAL_DATA_ROOT / "SynthetciGenMVAD2"
-# The notebook only rendered 3 fixed seeds (0, 1, 2), unlike the live generators above
-# which accept any seed -- job.seed (sweep convention: 1, 2, 3) is remapped onto this
-# range by subtracting 1 in ``_pregenerated_eval_set``.
+# Pre-generated seed ids; sweep seeds 1, 2, 3 map to 0, 1, 2.
 PREGENERATED_SEEDS = (0, 1, 2)
-# Backbone for the SuperADD MVTec AD 2 sweep. `large` (303M params) was used as a
-# lighter pilot to validate the pipeline; this is now the paper's actual
-# `huge_plus` (840M) config. Verified via an isolated memory/timing test: batch=4 at
-# 448x448 peaks at ~4.1 GB GPU memory across a full train-forward + subsample_embedding
-# + inference cycle -- comfortably fits alongside another concurrent job per GPU.
+# SuperADD backbone used for the paper results.
 SUPERADD_BACKBONE = "vit_huge_plus_patch16_dinov3"
 
 
@@ -133,18 +102,10 @@ MODEL_TRAINER = {
     "padim": {"max_epochs": 1},
     "efficient_ad": {"max_epochs": 20},
     "draem": {"max_epochs": 15},
-    # Dinomaly is a full gradient-trained reconstruction model. Its trainer_arguments
-    # intentionally drops ``max_steps`` so the engine/user controls the budget, and its
-    # ``configure_optimizers`` reads ``max_steps`` from the trainer to size the LR
-    # schedule (the paper uses 5000 steps; 1000 is the loss's ``p_schedule_steps`` and
-    # the value requested for the MVTec AD 2 comparison). ``max_epochs`` is set loose
-    # so the ``max_steps`` limit is the actual stopper.
+    # Dinomaly stops at max_steps.
     "dinomaly": {"max_steps": 1000, "max_epochs": 1000},
     "anomaly_dino": {"max_epochs": 1},
-    # SuperADD is a training-free memory-bank method: its own trainer_arguments
-    # hardcodes max_epochs=1 regardless of what is requested here (Engine always
-    # defers to the model's trainer_arguments over any user-supplied value), so this
-    # entry exists only to document that and avoid a KeyError below.
+    # SuperADD is training-free but still needs a trainer entry.
     "superadd": {"max_epochs": 1},
 }
 MODEL_BATCH = {"efficient_ad": 1, "draem": 2, "superadd": 4}
@@ -156,8 +117,7 @@ DEFAULT_BATCH = 8
 class JobConfig:
     """Configuration for a single training job.
 
-    One job trains a model once and emits a Real calibration row plus one row for each
-    synthetic calibration source. It can also emit optional synthetic-set diagnostics.
+    A job fits one model and evaluates each configured calibration source.
 
     Args:
         experiment (str): Named comparison this job belongs to.
@@ -165,15 +125,10 @@ class JobConfig:
         category (str): Category within the dataset.
         model (str): Model name.
         seed (int): Random seed for the datamodule and synthetic sampling.
-        pipelines (tuple[str, ...]): Internal synthetic-source ids to evaluate.
+        pipelines (tuple[str, ...]): Synthetic sources to evaluate.
         include_diagnostic (bool): Whether to emit synthetic-set diagnostic rows.
-        calibration (str): Source of the negative (normal) samples in the synthetic
-            calibration set. ``"test_normals"`` reuses the real test normals, which
-            leaks: the threshold is fitted not to flag the very images it is then
-            evaluated on. ``"heldout"`` instead draws them from a normal pool that is
-            disjoint from the test set (MVTec AD 2's native ``validation/`` split).
-        backbone (str | None): Backbone override for models that accept one (e.g.
-            SuperADD). ``None`` keeps the model's default (huge_plus for SuperADD).
+        calibration (str): Normal pool: ``"test_normals"`` or test-disjoint ``"heldout"``.
+        backbone (str | None): Optional backbone override.
     """
 
     experiment: str
@@ -181,7 +136,7 @@ class JobConfig:
     category: str
     model: str
     seed: int = 1
-    pipelines: tuple[str, ...] = ("P1", "P2", "P3")
+    pipelines: tuple[str, ...] = ("Perlin", "FLASH", "AnoStyler")
     include_diagnostic: bool = False
     calibration: str = "test_normals"
     backbone: str | None = None
@@ -197,14 +152,7 @@ class JobConfig:
 
 
 def build_evaluator() -> Evaluator:
-    """Return an evaluator with image and pixel metrics.
-
-    ``pixel_F1Score`` is computed from ``pred_mask`` against ``gt_mask`` with a single
-    global threshold and micro-averaged pixel counts, which is exactly MVTec AD 2's
-    SegF1 -- so no separate SegF1 metric is needed. ``AUPRO`` is reported at both the
-    conventional FPR<=0.3 and MVTec AD 2's stricter FPR<=0.05. ``AUPR`` at pixel level
-    is added because pixel AUROC is inflated by class imbalance.
-    """
+    """Return the image- and pixel-level evaluator used by the comparisons."""
     image = {"prefix": "image_"}
     pixel = {"prefix": "pixel_", "strict": False}
     val_metrics = [
@@ -233,20 +181,13 @@ def build_model(
     tiled: bool = False,
     backbone: str | None = None,
 ) -> object:
-    """Instantiate a model by name with the rich evaluator.
+    """Instantiate a detector with the evaluation metrics.
 
     Args:
         name (str): Model key.
-        resolution (tuple[int, int] | None): Input size for the model's pre-processor.
-            The model's own transform decides the effective input size, so resizing
-            only the datamodule is silently ignored. ``None`` keeps the model default.
-        tiled (bool): Whether the model will be run through tiled inference (see
-            ``tiled_harness.py``). Currently only affects Dinomaly, whose published
-            392 px center-crop must be disabled under tiling (see inline comment) --
-            kept as a general parameter so future tiled-specific adjustments have a
-            place to hook in.
-        backbone (str | None): Backbone override for models that accept one (e.g.
-            SuperADD). ``None`` keeps the model's default.
+        resolution (tuple[int, int] | None): Requested input size.
+        tiled (bool): Whether tiled inference is used.
+        backbone (str | None): Optional backbone override.
 
     Raises:
         RuntimeError: If the requested resolution is not the one the model will use.
@@ -264,48 +205,18 @@ def build_model(
     model_cls = factories[name]
     kwargs: dict = {"evaluator": evaluator}
     if name == "superadd":
-        # SuperADD's own configure_post_processor() returns a percentile-based
-        # threshold fit on normal-only validation scores (no F1AdaptiveThreshold),
-        # specifically because that adaptive threshold degenerates to the max
-        # validation score on datasets whose validation split is normal-only (like
-        # MVTec AD 2) -- see SuperADDPostProcessor's docstring. Force the standard
-        # F1AdaptiveThreshold-based PostProcessor instead so all calibration settings
-        # use the same thresholding rule (apples-to-apples comparison).
+        # Use the common thresholding rule for all detectors.
         kwargs["post_processor"] = PostProcessor()
         kwargs["backbone"] = backbone or SUPERADD_BACKBONE
     if name == "anomaly_dino":
-        # At 448 px the per-category patch bank (n_train x patches/image) is large
-        # enough that the all-pairs query/bank distance matrix OOMs on every MVTec AD 2
-        # category except the smallest (sheet_metal, 137 train images). Coreset
-        # subsampling shrinks the bank itself rather than the resolution.
+        # Limit the memory bank at 448 px.
         kwargs["coreset_subsampling"] = True
         kwargs["sampling_ratio"] = 0.1
-    # NOTE: an earlier version shrank PatchCore's coreset_sampling_ratio to 0.01 for
-    # tiled inference to cut its ~63 s/image cost. Verified (empirically, on normal vs
-    # anomalous scores) that this drops the memory bank to ~43 vectors, which destroys
-    # discriminative power: normal-image scores (57.9-59.1) and anomalous-image scores
-    # (62.0-63.5) barely overlapped at the DEFAULT ratio 0.1, but became indistinguishable
-    # (61.4-62.7 vs 62.3-63.9) at 0.01, producing a near-chance AUROC. Reverted -- do not
-    # shrink PatchCore's bank for speed; the wider tile stride below is the safe lever.
     if resolution is not None:
         if name == "dinomaly" and tiled:
-            # Dinomaly's published recipe resizes to 448 then center-crops to 392 (see
-            # configure_pre_processor's docstring); that crop lives INSIDE the model's
-            # pre-processor, so it fires on every forward pass, including each tile's.
-            # Under tiled inference each tile is already exactly `resolution` (448x448)
-            # and anomalib's `Tiler.untile()` expects the model to return a map the same
-            # shape as its input tile -- but the 392px crop shrinks the output map to
-            # 392x392, corrupting the stitched map (confirmed: every Dinomaly tiled run
-            # job crashed with a tensor-size mismatch when fitting the pixel threshold,
-            # since the corrupted map's element count no longer matched the mask's).
-            # Fix: pass crop_size == image_size so the crop is a no-op under tiling; the
-            # non-tiled 448 px path is unaffected since it never sets `tiled`.
+            # Disable Dinomaly's center crop so tile and map sizes match.
             kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution, crop_size=resolution[0])
         else:
-            # Use the model class's own factory: several models constrain their
-            # transform (EfficientAd and DRAEM reject a Normalize step because they
-            # normalise inside the forward pass), so the generic AnomalibModule
-            # pre-processor is rejected.
             kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution)
     model = model_cls(**kwargs)
     if resolution is not None:
@@ -325,13 +236,7 @@ def _resize_size(model: object) -> tuple[int, int] | None:
 
 
 def _effective_input_size(model: object) -> tuple[int, int] | None:
-    """Return the spatial size the network actually receives.
-
-    Some models crop after resizing (Dinomaly's published recipe is resize 448 then
-    center-crop 392), so the resize target alone overstates the true input size. The
-    crop is part of the model's official configuration and is deliberately preserved --
-    overriding it would deviate from the published recipe and weaken the baseline.
-    """
+    """Return the model's effective input size."""
     return _transform_size(model, CenterCrop) or _resize_size(model)
 
 
@@ -361,12 +266,7 @@ def make_generator(pipeline: str) -> SyntheticAnomalyGenerator | PerlinAnomalyGe
 
 
 def _take_normals(dataset: object, count: int, seed: int) -> object:
-    """Return a shallow copy of a normal dataset limited to ``count`` random rows.
-
-    Samples with replacement when ``count`` exceeds the pool size, so a small source
-    pool can still seed the requested number of anomalies (each draw gets an
-    independent mask, so duplicated sources still yield distinct anomalies).
-    """
+    """Return ``count`` sampled normal rows, with replacement if needed."""
     subset = copy.copy(dataset)
     available = len(dataset.samples)
     replace = count > available
@@ -385,12 +285,7 @@ def _synthetic_eval_set(
     augmenter: SyntheticAnomalyGenerator | PerlinAnomalyGenerator,
     seed: int,
 ) -> SyntheticAnomalyDataset:
-    """Build an eval dataset of ``{real normal negatives + N synthetic anomalies}``.
-
-    The negatives are used as-is (e.g. the real test normals) so the set differs from
-    the real test only in the anomaly source. Synthetic anomalies are generated from
-    ``source_normals`` (train normals); the generated normal rows are discarded.
-    """
+    """Build an evaluation set from real normals and synthetic anomalies."""
     source = _take_normals(source_normals, max(2 * n_anomalies, 4), seed)
     synthetic = SyntheticAnomalyDataset.from_dataset(source, augmenter=augmenter)
     anomalies = synthetic.samples[synthetic.samples.label_index == 1].head(n_anomalies).copy()
@@ -409,26 +304,17 @@ def _pregenerated_eval_set(
     n_anomalies: int,
     seed: int,
 ) -> AnomalibDataset:
-    """Build an eval dataset from a pre-generated (semantic-defect-bank) pipeline.
-
-    Unlike :func:`_synthetic_eval_set`, the (image, mask) pairs already exist on disk
-    under ``SYNTHETIC_GEN_ROOT`` -- rendered once by the generation notebook -- so this
-    only assembles the samples
-    ``DataFrame``, it does not augment anything itself.
+    """Build an evaluation set from pre-generated images and masks.
 
     Args:
-        negatives (object): Normal-sample pool (e.g. the heldout ``validation/`` set);
-            used as-is, matching :func:`_synthetic_eval_set`'s convention.
-        category (str): MVTec AD 2 category; must be one of ``PREGENERATED_CATEGORIES``.
-        pipeline (str): One of ``PREGENERATED_PIPELINES`` (``"FLASH"`` or ``"AnoStyler"``).
-        n_anomalies (int): Number of anomalous rows to keep (matches the real test
-            anomaly count, for parity with the live-generator pipelines).
-        seed (int): Sweep seed (1, 2, 3 convention); remapped onto the notebook's fixed
-            ``PREGENERATED_SEEDS`` (0, 1, 2) via ``(seed - 1) % 3``.
+        negatives (object): Normal-sample pool.
+        category (str): MVTec AD 2 category.
+        pipeline (str): ``"FLASH"`` or ``"AnoStyler"``.
+        n_anomalies (int): Number of synthetic anomalies.
+        seed (int): Sweep seed, mapped to the pre-generated seed ids.
 
     Raises:
-        FileNotFoundError: If no pre-generated images are found for this
-            (category, pipeline, seed) combination.
+        FileNotFoundError: If no pre-generated images are found.
     """
     source_dir = PREGENERATED_PIPELINES[pipeline]
     gen_seed = PREGENERATED_SEEDS[(seed - 1) % len(PREGENERATED_SEEDS)]
@@ -456,28 +342,14 @@ def _pregenerated_eval_set(
     negative_samples["split"] = Split.VAL
     dataset = AnomalibDataset(augmentations=getattr(negatives, "augmentations", None))
     dataset.samples = pd.concat([negative_samples, anomalies], ignore_index=True)
-    # A maskless synthetic source emits image-only rows (no ``*_mask.png``). ``AnomalibDataset``
-    # would crash on ``read_mask(None)`` for an abnormal row in segmentation mode, so
-    # fall back to classification when no masks are present. Pixel metrics on this set
-    # are then skipped (they are never evaluated on the synthetic rows anyway -- transferred
-    # transfers only the image threshold to the real test, which ships its own masks).
+    # Use classification when generated masks are absent.
     has_masks = anomalies["mask_path"].notna().any()
     dataset.samples.attrs["task"] = "segmentation" if has_masks else "classification"
     return dataset
 
 
 def build_datamodule(job: JobConfig) -> object:
-    """Construct the base datamodule (all train normals; real test as val and test).
-
-    The model trains on all official train normals and validates on the full official
-    test set (SAME_AS_TEST), so the fit-time threshold is the oracle F1-max. Synthetic
-    Synthetic calibration sets are injected later in :func:`run_job`.
-
-    Datamodules that ship their own validation split (MVTec AD 2) do not accept
-    ``val_split_mode``. For those the native split is stashed on
-    ``calibration_normals`` as a held-out, test-disjoint pool before ``val_data`` is
-    repointed at the real test to recover the oracle threshold.
-    """
+    """Build the datamodule and preserve a test-disjoint calibration pool."""
     dataset_cls, root, _ = DATASETS[job.dataset]
     train_batch = MODEL_BATCH.get(job.model, DEFAULT_BATCH)
     eval_batch = MODEL_EVAL_BATCH.get(job.model, DEFAULT_BATCH)
@@ -507,31 +379,20 @@ def build_datamodule(job: JobConfig) -> object:
     else:
         datamodule.calibration_normals = None
 
-    # Freeze the splits so the trainer does not re-run setup and discard our injection.
+    # Keep the injected splits.
     datamodule._is_setup = True  # noqa: SLF001
     return datamodule
 
 
 def _set_test_data(datamodule: object, dataset: object) -> None:
-    """Point the datamodule's test dataloader at ``dataset``.
-
-    ``MVTecAD2.test_dataloader`` dispatches on ``test_type`` and builds its loader from
-    ``test_public_data`` rather than ``test_data``, so assigning only ``test_data``
-    would be silently ignored and a diagnostic would duplicate the transferred result. Setting both keeps the
-    swap effective without replacing the method (which would make the datamodule
-    unpicklable for dataloader workers).
-    """
+    """Point both MVTec AD 2 test datasets at ``dataset``."""
     datamodule.test_data = dataset
     if hasattr(datamodule, "test_public_data"):
         datamodule.test_public_data = dataset
 
 
 def _calibration_negatives(job: JobConfig, datamodule: object, test_normals: object) -> object:
-    """Pick the normal samples used as negatives in the synthetic calibration set.
-
-    ``"heldout"`` requires a pool disjoint from the test set; it is the leakage-free
-    option and is currently only available where the dataset ships one.
-    """
+    """Select the normal pool for synthetic calibration."""
     if job.calibration == "test_normals":
         return test_normals
     if job.calibration == "heldout":
@@ -568,16 +429,7 @@ def _reset_metrics(model: object) -> None:
 
 
 def _reset_post_processor(model: object) -> None:
-    """Reset fitted threshold/normalization buffers for a fresh calibration.
-
-    ``PostProcessor.on_validation_epoch_end`` only overwrites a buffer when its metric
-    was updated during *that* validation pass. A maskless calibration set (AnomalyAny,
-    maskless calibration never updates the pixel-threshold metric, so without this reset the buffer
-    silently retains the value fitted during ``engine.fit`` -- the *oracle* threshold,
-    fitted on the real test -- inflating transferred pixel metrics. Resetting to NaN forces
-    either a clean refit (masked pipelines) or the well-defined midpoint-normalization
-    fallback (maskless pipelines, ``_normalize`` uses ``(max + min) / 2``).
-    """
+    """Clear fitted threshold and normalization buffers."""
     post_processor = getattr(model, "post_processor", None)
     if post_processor is None:
         return
@@ -589,13 +441,9 @@ def _reset_post_processor(model: object) -> None:
 
 @torch.no_grad()
 def collect_raw_scores(model: object, dataset: object, batch_size: int = 8) -> dict[str, list]:
-    """Return per-image *raw* (un-normalised) anomaly scores and labels for a dataset.
+    """Collect raw per-image scores and labels.
 
-    Aggregate metrics cannot answer whether the synthetic anomaly score distribution
-    matches the real one, so the per-image scores are recorded separately. The model is
-    invoked directly rather than through ``Engine.test`` so the scores bypass the
-    post-processor: normalisation is pivoted on the fitted threshold, which differs
-    between calibration settings and would make the distributions incomparable.
+    Scores bypass post-processing so calibration settings remain comparable.
 
     Args:
         model (object): A trained anomaly model exposing ``forward``.
@@ -603,7 +451,7 @@ def collect_raw_scores(model: object, dataset: object, batch_size: int = 8) -> d
         batch_size (int): Batch size for the scoring pass.
 
     Returns:
-        dict[str, list]: ``{"scores": [...], "labels": [...]}`` with one entry per image.
+        dict[str, list]: ``{"scores": [...], "labels": [...]}``.
     """
     loader = DataLoader(
         dataset,
@@ -672,14 +520,10 @@ def _row(
 
 
 def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
-    """Train one model once and evaluate every calibration source from that model.
-
-    Returns one row for Real calibration, one row per synthetic source with its threshold
-    transferred to the real test, and optional synthetic-set diagnostic rows.
+    """Fit one model and evaluate all configured calibration sources.
 
     Returns:
-        tuple: ``(rows, scores)`` where ``scores`` maps ``"real_test"`` and each
-        pipeline id to raw per-image ``{"scores": [...], "labels": [...]}``.
+        tuple: Result rows and raw score records by source.
     """
     model = build_model(job.model, RESOLUTIONS.get(job.dataset), backbone=job.backbone)
     eff_size = _effective_input_size(model)
@@ -698,14 +542,13 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
             **MODEL_TRAINER[job.model],
         )
 
-        # Train once; fit-time validation on the real test sets the oracle threshold.
+        # Fit once; Real calibration is the oracle reference.
         start = time.time()
         engine.fit(model=model, datamodule=datamodule)
         fit_seconds = round(time.time() - start, 2)
 
         rows: list[dict] = []
 
-        # Real calibration is the paper's oracle reference.
         _reset_metrics(model)
         start = time.time()
         results_a = engine.test(model=model, datamodule=datamodule, verbose=False)
@@ -719,7 +562,6 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
         n_anomalies = len(test_anomalies)
         negatives = _calibration_negatives(job, datamodule, test_normals)
 
-        # Raw per-image scores on the real test, for score-distribution comparisons.
         eval_batch = MODEL_EVAL_BATCH.get(job.model, DEFAULT_BATCH)
         scores: dict[str, dict[str, list]] = {
             "real_test": collect_raw_scores(model, real_test, batch_size=eval_batch),
@@ -749,14 +591,12 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
 
             calibration_source = CALIBRATION_SOURCES.get(pipeline, pipeline)
 
-            # Refit the threshold on the synthetic calibration set.
             datamodule.val_data = calibration
             _set_test_data(datamodule, real_test)
             _reset_metrics(model)
             _reset_post_processor(model)
             engine.validate(model=model, datamodule=datamodule, verbose=False)
 
-            # Evaluate the synthetic-derived threshold on the real test set.
             _reset_metrics(model)
             start = time.time()
             results_b = engine.test(model=model, datamodule=datamodule, verbose=False)
@@ -768,7 +608,6 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
             )
 
             if job.include_diagnostic:
-                # Diagnose how the same threshold behaves on its calibration set.
                 _set_test_data(datamodule, calibration)
                 _reset_metrics(model)
                 start = time.time()

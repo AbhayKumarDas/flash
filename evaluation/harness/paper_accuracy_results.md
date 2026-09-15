@@ -1,8 +1,6 @@
 # Synthetic-Anomaly Accuracy Results — Combined Paper Tables
 
-Five detection models × 8 MVTec AD 2 categories × 4 anomaly sources. Real is the oracle
-reference, while Perlin, AnoStyler, and FLASH (Ours) calibrate thresholds with synthetic
-anomalies and transfer them to the real test set. **All metrics are percentages (0–100).**
+Five detectors × 8 MVTec AD 2 categories × 4 calibration sources. **Metrics are percentages.**
 
 ## Setting → calibration mapping
 
@@ -13,9 +11,8 @@ anomalies and transfer them to the real test set. **All metrics are percentages 
 | AnoStyler | Held-out normals + AnoStyler anomalies | Real test set |
 | FLASH (Ours) | Held-out normals + FLASH anomalies | Real test set |
 
-Real and Perlin are measured in both cross-model comparisons (three seeds each) and
-averaged for lower variance. Dinomaly is evaluated in its dedicated comparison. AnoStyler
-and FLASH are evaluated wherever their calibration data are available.
+Real and Perlin use three seeds in the cross-model comparisons. AnoStyler and FLASH are
+included where their calibration data are available; Dinomaly has a dedicated comparison.
 
 ## image F1 — mean ± std over categories (%)
 
@@ -41,7 +38,7 @@ and FLASH are evaluated wherever their calibration data are available.
 
 # Full per-metric tables
 
-Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories (percentages).
+Rows are models; columns are calibration sources. Values are mean ± std over 8 categories.
 
 ## image AUROC (%)
 

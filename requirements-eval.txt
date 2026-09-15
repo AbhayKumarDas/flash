@@ -1,9 +1,7 @@
-# The evaluation notebooks and paper-reproduction harness in evaluation/ only. This full anomaly
-# detection stack is not needed to generate synthetic data.
+# Evaluation notebooks and paper-reproduction harness only.
 #
-# The paper numbers were produced with the anomalib tree at this immutable public-fork commit.
-# Do not replace it with a floating branch or a newer PyPI release when reproducing the tables:
-# the MVTec AD 2 split handling and SuperADD implementation affect the reported values.
+# Pin anomalib to the commit used for the reported tables. It preserves the MVTec AD 2 split
+# and SuperADD implementation.
 
 -r requirements.txt
 

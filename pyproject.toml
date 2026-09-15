@@ -39,9 +39,7 @@ dependencies = [
 [project.optional-dependencies]
 # Modules 1 and 2 only. Module 3 loads no model.
 vlm = ["transformers>=4.49", "accelerate>=0.30"]
-# The evaluation notebooks and paper-reproduction harness. The pinned anomalib commit is the
-# implementation used to produce the reported tables; it is intentionally not a floating PyPI
-# dependency.
+# Evaluation notebooks and paper-reproduction harness. Pin anomalib to the reported-results commit.
 eval = [
     "anomalib @ git+https://github.com/rajeshgangireddy/anomalib.git@0e6107dc51bf803ae6ae522fa2fb37baf463b6ac",
     "timm>=1.0",

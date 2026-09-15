@@ -1,12 +1,9 @@
 # Copyright (C) 2020-2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Run a single training job and persist its result rows as JSON.
+"""Run one calibration job and save its result rows as JSON.
 
-One job trains a model once and emits a Real calibration row plus one row per synthetic
-source, with an optional synthetic-set diagnostic. Each job writes ``results/raw/<key>.json``
-as a list of rows, so jobs are independent and the sweep is resumable (an existing
-file means the job is skipped). Aggregation into a CSV is handled by ``sweep.py``.
+Existing result files are skipped; ``sweep.py`` aggregates the rows into CSV.
 
 Usage:
     python -m evaluation.harness.run_one \
