@@ -1,4 +1,4 @@
-# Synthetic-Anomaly Accuracy Results — Combined Paper Tables
+# Synthetic-Anomaly Accuracy Results — F1 Tables
 
 Five detectors × 8 MVTec AD 2 categories × 4 calibration sources. **Metrics are percentages.**
 
@@ -9,14 +9,14 @@ Five detectors × 8 MVTec AD 2 categories × 4 calibration sources. **Metrics ar
 | Real (oracle) | Real test anomalies | Real test set |
 | Perlin | Held-out normals + Perlin anomalies | Real test set |
 | AnoStyler | Held-out normals + AnoStyler anomalies | Real test set |
-| FLASH (Ours) | Held-out normals + FLASH anomalies | Real test set |
+| FLASH | Held-out normals + FLASH anomalies | Real test set |
 
 Real and Perlin use three seeds in the cross-model comparisons. AnoStyler and FLASH are
 included where their calibration data are available; Dinomaly has a dedicated comparison.
 
 ## image F1 — mean ± std over categories (%)
 
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | PaDiM | 80.37±6.52 | 69.41±14.18 | 62.37±22.95 | 79.11±6.59 |
 | PatchCore | 82.46±7.23 | 67.50±16.07 | 43.02±25.03 | 74.64±12.31 |
@@ -26,7 +26,7 @@ included where their calibration data are available; Dinomaly has a dedicated co
 
 ## pixel F1 (SegF1) — mean ± std over categories (%)
 
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | PaDiM | 7.63±5.40 | 3.05±3.56 | 5.37±5.06 | 3.89±5.07 |
 | PatchCore | 26.09±14.99 | 14.90±18.07 | 16.08±17.54 | 18.14±15.04 |
@@ -36,113 +36,7 @@ included where their calibration data are available; Dinomaly has a dedicated co
 
 ---
 
-# Full per-metric tables
-
-Rows are models; columns are calibration sources. Values are mean ± std over 8 categories.
-
-## image AUROC (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 61.79±11.34 | 61.81±11.33 | 61.80±12.76 | 61.52±11.20 |
-| PatchCore | 72.50±17.12 | 72.49±17.12 | 72.48±17.59 | 70.73±16.46 |
-| AnomalyDINO | 69.93±16.66 | 70.05±16.39 | 70.06±16.27 | 69.92±15.87 |
-| Dinomaly | 68.49±13.07 | 68.29±12.93 | 68.30±12.93 | 68.87±12.22 |
-| SuperADD (ViT-H+) | 74.50±16.46 | 74.13±16.73 | 74.19±16.70 | 74.01±16.70 |
-
-## image F1 (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 80.37±6.52 | 69.41±14.18 | 62.37±22.95 | 79.11±6.59 |
-| PatchCore | 82.46±7.23 | 67.50±16.07 | 43.02±25.03 | 74.64±12.31 |
-| AnomalyDINO | 81.47±6.97 | 62.19±19.47 | 49.85±19.68 | 77.05±10.73 |
-| Dinomaly | 81.81±5.99 | 60.42±24.92 | 55.37±18.86 | 77.51±11.17 |
-| SuperADD (ViT-H+) | 83.64±8.47 | 79.12±10.38 | 64.36±22.75 | 78.13±8.37 |
-
-## image AUPR (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 75.38±12.10 | 75.31±11.59 | 73.88±13.17 | 76.29±10.46 |
-| PatchCore | 82.57±13.91 | 81.81±15.08 | 81.81±15.38 | 83.92±12.51 |
-| AnomalyDINO | 81.56±14.35 | 80.83±15.54 | 80.81±15.47 | 82.28±13.01 |
-| Dinomaly | 79.92±12.74 | 77.59±14.87 | 77.64±14.85 | 80.59±12.29 |
-| SuperADD (ViT-H+) | 85.30±12.30 | 83.84±14.64 | 83.61±14.45 | 83.77±14.61 |
-
-## image Prec (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 69.74±10.79 | 70.59±12.24 | 68.09±12.74 | 66.35±8.48 |
-| PatchCore | 73.90±12.01 | 75.71±17.25 | 82.77±18.56 | 69.38±14.03 |
-| AnomalyDINO | 73.39±12.89 | 67.76±15.57 | 82.66±16.79 | 66.37±8.45 |
-| Dinomaly | 73.18±11.38 | 69.72±11.94 | 79.74±15.20 | 68.03±7.99 |
-| SuperADD (ViT-H+) | 77.12±14.20 | 72.57±17.27 | 84.76±16.49 | 66.31±8.53 |
-
-## image Rec (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 96.65±2.07 | 79.36±27.14 | 67.60±27.74 | 98.75±3.31 |
-| PatchCore | 95.25±4.49 | 71.90±29.80 | 33.88±24.18 | 87.48±22.10 |
-| AnomalyDINO | 94.37±6.23 | 65.58±30.09 | 41.87±21.43 | 93.70±16.66 |
-| Dinomaly | 95.01±6.27 | 65.34±33.48 | 51.09±26.62 | 92.27±17.86 |
-| SuperADD (ViT-H+) | 94.08±6.42 | 91.61±13.79 | 58.43±26.17 | 95.97±10.66 |
-
-## pixel AUROC (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 81.37±5.47 | 81.37±5.47 | 81.20±5.38 | 81.55±5.60 |
-| PatchCore | 87.29±7.22 | 87.29±7.22 | 87.32±7.17 | 86.96±7.76 |
-| AnomalyDINO | 87.12±12.14 | 87.27±11.89 | 87.29±11.73 | 87.13±12.13 |
-| Dinomaly | 88.17±10.58 | 88.17±10.58 | 88.17±10.58 | 88.17±10.58 |
-| SuperADD (ViT-H+) | 90.92±10.50 | 90.92±10.50 | 90.88±10.57 | 90.94±10.52 |
-
-## pixel F1 (SegF1) (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 7.63±5.40 | 3.05±3.56 | 5.37±5.06 | 3.89±5.07 |
-| PatchCore | 26.09±14.99 | 14.90±18.07 | 16.08±17.54 | 18.14±15.04 |
-| AnomalyDINO | 33.55±20.77 | 17.47±17.21 | 13.99±15.71 | 26.11±21.14 |
-| Dinomaly | 31.90±19.15 | 15.45±13.71 | 3.35±3.92 | 22.53±14.75 |
-| SuperADD (ViT-H+) | 51.53±22.76 | 19.44±19.51 | 36.99±21.92 | 38.38±25.18 |
-
-## pixel AUPR (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 3.41±2.71 | 3.41±2.69 | 3.43±2.67 | 3.34±2.76 |
-| PatchCore | 20.57±15.62 | 20.57±15.62 | 20.61±15.65 | 20.52±15.60 |
-| AnomalyDINO | 27.38±18.89 | 27.26±18.94 | 27.14±18.90 | 27.41±18.85 |
-| Dinomaly | 23.60±15.89 | 23.75±15.82 | 23.56±15.91 | 23.71±15.98 |
-| SuperADD (ViT-H+) | 46.74±23.28 | 46.87±23.30 | 46.67±23.22 | 46.80±23.25 |
-
-## pixel AUPRO (0.3) (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 42.10±9.97 | 42.10±9.97 | 42.46±9.91 | 41.74±10.18 |
-| PatchCore | 54.02±19.38 | 54.02±19.38 | 53.99±19.40 | 54.05±19.36 |
-| AnomalyDINO | 51.67±22.09 | 51.42±22.01 | 50.87±21.79 | 51.62±22.00 |
-| Dinomaly | 58.74±20.91 | 58.74±20.91 | 58.74±20.91 | 58.74±20.91 |
-| SuperADD (ViT-H+) | 50.53±22.35 | 50.53±22.35 | 50.69±22.44 | 50.37±22.30 |
-
-## pixel AUPRO (0.05) (%)
-
-| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
-|---|---|---|---|---|
-| PaDiM | 9.96±7.04 | 9.96±7.04 | 9.69±6.91 | 10.23±7.24 |
-| PatchCore | 28.72±19.86 | 28.72±19.86 | 28.64±19.88 | 28.80±19.83 |
-| AnomalyDINO | 30.38±21.35 | 30.29±21.04 | 30.21±20.96 | 30.37±21.12 |
-| Dinomaly | 30.85±19.93 | 30.85±19.93 | 30.85±19.93 | 30.85±19.93 |
-| SuperADD (ViT-H+) | 29.36±25.63 | 29.36±25.63 | 29.29±25.55 | 29.43±25.72 |
-
----
-
-# Per-category breakdown (headline metrics)
+# Per-category F1 breakdown
 
 Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the two
 cross-model comparisons). Values are percentages.
@@ -151,7 +45,7 @@ cross-model comparisons). Values are percentages.
 
 ### PaDiM
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 0.16 | 0.05 | 0.05 | 0.05 |
 | fabric | 3.36 | 1.44 | 0.93 | 1.01 |
@@ -164,7 +58,7 @@ cross-model comparisons). Values are percentages.
 
 ### PatchCore
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 0.06 | 0.04 | 0.00 | 0.00 |
 | fabric | 15.27 | 1.88 | 2.05 | 15.19 |
@@ -177,7 +71,7 @@ cross-model comparisons). Values are percentages.
 
 ### AnomalyDINO
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 0.06 | 0.04 | 0.00 | 0.00 |
 | fabric | 46.11 | 16.61 | 20.11 | 37.66 |
@@ -190,7 +84,7 @@ cross-model comparisons). Values are percentages.
 
 ### Dinomaly
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 0.03 | 0.03 | 0.00 | 0.00 |
 | fabric | 27.45 | 15.68 | 3.77 | 19.46 |
@@ -203,7 +97,7 @@ cross-model comparisons). Values are percentages.
 
 ### SuperADD (ViT-H+)
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 0.02 | 0.01 | 0.00 | 0.00 |
 | fabric | 78.36 | 18.57 | 44.30 | 69.06 |
@@ -218,7 +112,7 @@ cross-model comparisons). Values are percentages.
 
 ### PaDiM
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 71.49 | 44.60 | 64.67 | 68.93 |
 | fabric | 73.89 | 73.17 | 58.37 | 73.17 |
@@ -231,7 +125,7 @@ cross-model comparisons). Values are percentages.
 
 ### PatchCore
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 70.92 | 37.86 | 42.56 | 45.33 |
 | fabric | 79.47 | 73.17 | 16.33 | 73.17 |
@@ -244,7 +138,7 @@ cross-model comparisons). Values are percentages.
 
 ### AnomalyDINO
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 71.34 | 46.75 | 44.28 | 52.45 |
 | fabric | 74.44 | 73.17 | 24.40 | 73.17 |
@@ -257,7 +151,7 @@ cross-model comparisons). Values are percentages.
 
 ### Dinomaly
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 71.43 | 43.21 | 51.48 | 50.81 |
 | fabric | 77.42 | 73.17 | 29.18 | 73.17 |
@@ -270,7 +164,7 @@ cross-model comparisons). Values are percentages.
 
 ### SuperADD (ViT-H+)
 
-| category | Real | Perlin | AnoStyler | FLASH (Ours) |
+| category | Real | Perlin | AnoStyler | FLASH |
 |---|---|---|---|---|
 | can | 71.19 | 61.14 | 61.46 | 61.10 |
 | fabric | 75.60 | 73.17 | 41.03 | 73.17 |

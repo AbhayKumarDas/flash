@@ -41,7 +41,7 @@ dependencies = [
 vlm = ["transformers>=4.49", "accelerate>=0.30"]
 # Evaluation notebooks and paper-reproduction harness. Pin anomalib to the reported-results commit.
 eval = [
-    "anomalib @ git+https://github.com/rajeshgangireddy/anomalib.git@0e6107dc51bf803ae6ae522fa2fb37baf463b6ac",
+    "anomalib @ git+https://github.com/open-edge-platform/anomalib.git@0e6107dc51bf803ae6ae522fa2fb37baf463b6ac",
     "timm>=1.0",
     "scikit-learn>=1.3",
 ]
