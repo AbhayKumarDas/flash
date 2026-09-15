@@ -3,15 +3,15 @@
 
 """Run a single training job and persist its result rows as JSON.
 
-One job trains a model once and emits several rows (arm A + arm B per pipeline,
-plus arm C per pipeline when requested). Each job writes ``results/raw/<key>.json``
+One job trains a model once and emits a Real calibration row plus one row per synthetic
+source, with an optional synthetic-set diagnostic. Each job writes ``results/raw/<key>.json``
 as a list of rows, so jobs are independent and the sweep is resumable (an existing
 file means the job is skipped). Aggregation into a CSV is handled by ``sweep.py``.
 
 Usage:
     python -m evaluation.harness.run_one \
-        --phase phase11_clean_baseline --dataset mvtec2 --category rice \
-        --model patchcore --seed 1 --pipelines P0
+        --experiment cross_model_comparison --dataset mvtec2 --category rice \
+        --model patchcore --seed 1 --sources Perlin
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ import argparse
 import json
 from pathlib import Path
 
-from evaluation.harness.harness import JobConfig, run_job
+from evaluation.harness.harness import CALIBRATION_PIPELINES, JobConfig, run_job
 from evaluation.harness.tiled_harness import run_tiled_job
 
 RAW_DIR = Path(__file__).parent / "results" / "raw"
@@ -29,14 +29,20 @@ SCORES_DIR = Path(__file__).parent / "results" / "scores"
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments for a single job."""
-    parser = argparse.ArgumentParser(description="Run a single synthetic-anomaly training job.")
-    parser.add_argument("--phase", required=True)
+    parser = argparse.ArgumentParser(description="Run a single synthetic-anomaly calibration job.")
+    parser.add_argument("--experiment", required=True)
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--category", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--seed", type=int, default=1)
-    parser.add_argument("--pipelines", nargs="+", default=["P1", "P2", "P3"])
-    parser.add_argument("--include-c", action="store_true")
+    parser.add_argument(
+        "--sources",
+        nargs="+",
+        choices=sorted(CALIBRATION_PIPELINES),
+        default=["Perlin", "FLASH", "AnoStyler"],
+        help="Synthetic calibration sources to evaluate.",
+    )
+    parser.add_argument("--include-diagnostic", action="store_true")
     parser.add_argument(
         "--calibration",
         default="test_normals",
@@ -63,13 +69,13 @@ def main() -> None:
     """Execute one job and write its result JSON (unless already present)."""
     args = parse_args()
     job = JobConfig(
-        phase=args.phase,
+        experiment=args.experiment,
         dataset=args.dataset,
         category=args.category,
         model=args.model,
         seed=args.seed,
-        pipelines=tuple(args.pipelines),
-        include_c=args.include_c,
+        pipelines=tuple(CALIBRATION_PIPELINES[source] for source in args.sources),
+        include_diagnostic=args.include_diagnostic,
         calibration=args.calibration,
         backbone=args.backbone,
     )

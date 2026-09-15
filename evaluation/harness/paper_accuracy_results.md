@@ -1,28 +1,25 @@
 # Synthetic-Anomaly Accuracy Results — Combined Paper Tables
 
-Five detection models × 8 MVTec AD 2 categories × 4 anomaly sources, from the last
-three phases: `phase11_clean_baseline` (Perlin P0 vs our hybrid P6), `phase14_anostyler`
-(Perlin P0 vs AnoStyler P8), and `phase15_dinomaly` (Dinomaly on all four sources). All
-values are **arm B** (synthetic-calibrated threshold transferred to the real test set)
-except **Real (oracle)**, which is **arm A** (the fit-time oracle threshold on the real
-test — the upper bound). **All metrics are percentages (0–100).**
+Five detection models × 8 MVTec AD 2 categories × 4 anomaly sources. Real is the oracle
+reference, while Perlin, AnoStyler, and FLASH (Ours) calibrate thresholds with synthetic
+anomalies and transfer them to the real test set. **All metrics are percentages (0–100).**
 
-## Method → source mapping
+## Setting → calibration mapping
 
-| method | arm / pipeline | source phase(s) |
+| setting | calibration data | evaluation data |
 |---|---|---|
-| Real (oracle) | A / `-` | phase11+phase14 (averaged) · phase15 (Dinomaly) |
-| Perlin (P0) | B / `P0` | phase11+phase14 (averaged) · phase15 (Dinomaly) |
-| AnoStyler (P8) | B / `P8` | phase14 · phase15 (Dinomaly) |
-| Flash (ours) | B / `P6` | phase11 · phase15 (Dinomaly) |
+| Real (oracle) | Real test anomalies | Real test set |
+| Perlin | Held-out normals + Perlin anomalies | Real test set |
+| AnoStyler | Held-out normals + AnoStyler anomalies | Real test set |
+| FLASH (Ours) | Held-out normals + FLASH anomalies | Real test set |
 
-Real and Perlin are measured in *both* phase11 and phase14 (identical protocol, 3 seeds
-each) and averaged for lower variance; Dinomaly is single-phase (phase15). AnoStyler and
-Flash are single-phase for the four val-only models.
+Real and Perlin are measured in both cross-model comparisons (three seeds each) and
+averaged for lower variance. Dinomaly is evaluated in its dedicated comparison. AnoStyler
+and FLASH are evaluated wherever their calibration data are available.
 
 ## image F1 — mean ± std over categories (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 80.37±6.52 | 69.41±14.18 | 62.37±22.95 | 79.11±6.59 |
 | PatchCore | 82.46±7.23 | 67.50±16.07 | 43.02±25.03 | 74.64±12.31 |
@@ -32,7 +29,7 @@ Flash are single-phase for the four val-only models.
 
 ## pixel F1 (SegF1) — mean ± std over categories (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 7.63±5.40 | 3.05±3.56 | 5.37±5.06 | 3.89±5.07 |
 | PatchCore | 26.09±14.99 | 14.90±18.07 | 16.08±17.54 | 18.14±15.04 |
@@ -48,7 +45,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## image AUROC (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 61.79±11.34 | 61.81±11.33 | 61.80±12.76 | 61.52±11.20 |
 | PatchCore | 72.50±17.12 | 72.49±17.12 | 72.48±17.59 | 70.73±16.46 |
@@ -58,7 +55,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## image F1 (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 80.37±6.52 | 69.41±14.18 | 62.37±22.95 | 79.11±6.59 |
 | PatchCore | 82.46±7.23 | 67.50±16.07 | 43.02±25.03 | 74.64±12.31 |
@@ -68,7 +65,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## image AUPR (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 75.38±12.10 | 75.31±11.59 | 73.88±13.17 | 76.29±10.46 |
 | PatchCore | 82.57±13.91 | 81.81±15.08 | 81.81±15.38 | 83.92±12.51 |
@@ -78,7 +75,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## image Prec (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 69.74±10.79 | 70.59±12.24 | 68.09±12.74 | 66.35±8.48 |
 | PatchCore | 73.90±12.01 | 75.71±17.25 | 82.77±18.56 | 69.38±14.03 |
@@ -88,7 +85,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## image Rec (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 96.65±2.07 | 79.36±27.14 | 67.60±27.74 | 98.75±3.31 |
 | PatchCore | 95.25±4.49 | 71.90±29.80 | 33.88±24.18 | 87.48±22.10 |
@@ -98,7 +95,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## pixel AUROC (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 81.37±5.47 | 81.37±5.47 | 81.20±5.38 | 81.55±5.60 |
 | PatchCore | 87.29±7.22 | 87.29±7.22 | 87.32±7.17 | 86.96±7.76 |
@@ -108,7 +105,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## pixel F1 (SegF1) (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 7.63±5.40 | 3.05±3.56 | 5.37±5.06 | 3.89±5.07 |
 | PatchCore | 26.09±14.99 | 14.90±18.07 | 16.08±17.54 | 18.14±15.04 |
@@ -118,7 +115,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## pixel AUPR (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 3.41±2.71 | 3.41±2.69 | 3.43±2.67 | 3.34±2.76 |
 | PatchCore | 20.57±15.62 | 20.57±15.62 | 20.61±15.65 | 20.52±15.60 |
@@ -128,7 +125,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## pixel AUPRO (0.3) (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 42.10±9.97 | 42.10±9.97 | 42.46±9.91 | 41.74±10.18 |
 | PatchCore | 54.02±19.38 | 54.02±19.38 | 53.99±19.40 | 54.05±19.36 |
@@ -138,7 +135,7 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 ## pixel AUPRO (0.05) (%)
 
-| model | Real (oracle) | Perlin (P0) | AnoStyler (P8) | Flash (ours) |
+| model | Real (oracle) | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | PaDiM | 9.96±7.04 | 9.96±7.04 | 9.69±6.91 | 10.23±7.24 |
 | PatchCore | 28.72±19.86 | 28.72±19.86 | 28.64±19.88 | 28.80±19.83 |
@@ -150,13 +147,14 @@ Each table: rows = 5 models, columns = 4 methods, mean ± std over 8 categories 
 
 # Per-category breakdown (headline metrics)
 
-Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the two phases). Values are percentages.
+Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the two
+cross-model comparisons). Values are percentages.
 
 ## pixel F1 (SegF1) — per model (%)
 
 ### PaDiM
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 0.16 | 0.05 | 0.05 | 0.05 |
 | fabric | 3.36 | 1.44 | 0.93 | 1.01 |
@@ -169,7 +167,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### PatchCore
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 0.06 | 0.04 | 0.00 | 0.00 |
 | fabric | 15.27 | 1.88 | 2.05 | 15.19 |
@@ -182,7 +180,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### AnomalyDINO
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 0.06 | 0.04 | 0.00 | 0.00 |
 | fabric | 46.11 | 16.61 | 20.11 | 37.66 |
@@ -195,7 +193,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### Dinomaly
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 0.03 | 0.03 | 0.00 | 0.00 |
 | fabric | 27.45 | 15.68 | 3.77 | 19.46 |
@@ -208,7 +206,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### SuperADD (ViT-H+)
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 0.02 | 0.01 | 0.00 | 0.00 |
 | fabric | 78.36 | 18.57 | 44.30 | 69.06 |
@@ -223,7 +221,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### PaDiM
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 71.49 | 44.60 | 64.67 | 68.93 |
 | fabric | 73.89 | 73.17 | 58.37 | 73.17 |
@@ -236,7 +234,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### PatchCore
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 70.92 | 37.86 | 42.56 | 45.33 |
 | fabric | 79.47 | 73.17 | 16.33 | 73.17 |
@@ -249,7 +247,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### AnomalyDINO
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 71.34 | 46.75 | 44.28 | 52.45 |
 | fabric | 74.44 | 73.17 | 24.40 | 73.17 |
@@ -262,7 +260,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### Dinomaly
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 71.43 | 43.21 | 51.48 | 50.81 |
 | fabric | 77.42 | 73.17 | 29.18 | 73.17 |
@@ -275,7 +273,7 @@ Each cell is the mean over 3 seeds (real/Perlin additionally averaged over the t
 
 ### SuperADD (ViT-H+)
 
-| category | Real | Perlin | AnoStyler | Flash (ours) |
+| category | Real | Perlin | AnoStyler | FLASH (Ours) |
 |---|---|---|---|---|
 | can | 71.19 | 61.14 | 61.46 | 61.10 |
 | fabric | 75.60 | 73.17 | 41.03 | 73.17 |

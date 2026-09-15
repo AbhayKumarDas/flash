@@ -171,8 +171,8 @@ baseline does not pay at all, a full category costs **112.8 s** against **1,348.
 the generative cost of FLASH is fixed per category, so every additional synthetic image is
 procedural.
 
-Full per-arm tables, including the diagnostic arm that evaluates the fitted threshold back on the
-synthetic set, are in
+Full calibration-setting tables, including the diagnostic that evaluates the fitted threshold
+back on the synthetic set, are in
 [`evaluation/results/combined_results_8_categories.txt`](evaluation/results/combined_results_8_categories.txt),
 and the complete comparison tables are in the paper.
 

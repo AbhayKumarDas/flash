@@ -1,20 +1,16 @@
 # Copyright (C) 2020-2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Core harness for the synthetic-anomaly experiments.
+"""Core harness for the synthetic-anomaly calibration experiments.
 
 A single job trains one model **once** on all train normals and then derives every
-evaluation arm from that identical model, so the arms differ only in the threshold
-source (never in the underlying weights). This removes the model-variance confound
-that separate per-arm training introduced.
+evaluation setting from that identical model, so settings differ only in the threshold
+calibration source (never in the underlying weights).
 
-Arms (all share one trained model; full official test for A and B):
-    A: oracle. Threshold from the real test (fit-time val = SAME_AS_TEST) -> oracle F1-max.
-    B: proxy. Threshold refit on {real test normals + N synthetic anomalies}
-       (N = real anomaly count), then transferred to the full real test. Differs from
-       A only in real->synthetic anomalies (same normals, same model).
-    C: diagnostic. Threshold refit on, and evaluated on, the synthetic set itself
-       (is the synthetic set too easy/hard relative to the real test?).
+The reported settings follow the paper: Real calibration is the oracle reference, while
+Perlin, FLASH, and AnoStyler use held-out normals plus synthetic anomalies to calibrate a
+threshold that is then transferred to the real test set. An optional synthetic-set
+diagnostic evaluates that same threshold on its calibration data.
 """
 
 from __future__ import annotations
@@ -52,7 +48,7 @@ BinaryRecallMetric = create_anomalib_metric(BinaryRecall)
 # resolves to ``abc`` and pickle cannot find it again -- which makes checkpointing fail
 # for any dynamically created metric. Repoint the identity at this module (using the
 # original torchmetrics class names, so the reported column stays ``image_BinaryPrecision``
-# / ``image_BinaryRecall`` and matches every earlier phase) so the classes are
+# / ``image_BinaryRecall`` and matches the reported output schema) so the classes are
 # importable by their bound names.
 for _name, _cls in (("BinaryPrecision", BinaryPrecisionMetric), ("BinaryRecall", BinaryRecallMetric)):
     _cls.__name__ = _cls.__qualname__ = _name
@@ -88,47 +84,27 @@ RESOLUTIONS: dict[str, tuple[int, int] | None] = {
     "mvtec2": (448, 448),
 }
 
-# Pipeline registry: id -> (preset, generator overrides).
-PIPELINES = {
-    # Stock, unmodified anomalib `PerlinAnomalyGenerator` (the literal class DRAEM's
-    # own training loop uses, and `make_synthetic_dataset`'s own no-argument default)
-    # -- NOT built from our composable SyntheticAnomalyGenerator framework at all. This
-    # is the genuine "vanilla anomalib Perlin, zero customization from this project"
-    # baseline: whole-image region, DTD texture content, alpha blend, all baked into
-    # one class with no separate mask/region/source/blend abstraction. Kwargs mirror
-    # `make_synthetic_dataset`'s own default (see `synthetic.py`), which is anomalib's
-    # literal out-of-the-box behavior when no custom augmenter is supplied.
-    "P0": None,
-    "P1": ("texture_alpha", {"source_kwargs": {"texture_path": EVAL_DATA_ROOT / "dtd"}}),
-    "P2": ("self_alpha", {}),
-    "P3": ("self_poisson", {}),
-    # Area-routed blend: alpha keeps small components visible, Poisson keeps large
-    # ones seamless. Threshold is in pixels at the model's input resolution.
-    "P4": ("self_hybrid", {"blend_kwargs": {"area_threshold": 2500}}),
-    # Threshold ablation around P4. Lower values route more area through Poisson
-    # (approaching P3); higher values route more through alpha (approaching P2).
-    "P4a": ("self_hybrid", {"blend_kwargs": {"area_threshold": 500}}),
-    "P4b": ("self_hybrid", {"blend_kwargs": {"area_threshold": 1000}}),
-    "P4c": ("self_hybrid", {"blend_kwargs": {"area_threshold": 6000}}),
-    "P4d": ("self_hybrid", {"blend_kwargs": {"area_threshold": 12000}}),
-}
+# The paper reproduction path uses the stock anomalib Perlin baseline for live synthesis.
+PIPELINES = {"Perlin": None}
 
-# Pre-generated synthetic-anomaly pipelines: id -> semantic-defect-bank blend arm.
-# Unlike PIPELINES above (live augmentation via SyntheticAnomalyGenerator), these read
-# already-rendered (image, mask) pairs from disk -- produced once by
-# the generation notebook, which cuts real defect patches from a
-# small donor bank and replays them onto held-out train/good hosts at MRSP/OBS-chosen
+# Pre-generated synthetic-anomaly sources read already-rendered (image, mask) pairs.
+# They are produced once by the generation notebook, which cuts real defect patches from
+# a small donor bank and replays them onto held-out train/good hosts at MRSP/OBS-chosen
 # sites (see that notebook's own docs for the full method). See
 # ``_pregenerated_eval_set`` for how these are turned into an evaluable dataset.
 #
-# As of the 2026-08-25 regeneration (`flash-part1.ipynb`), the on-disk directories were
-# renamed and consolidated: `MVTec_AD_2_alpha_*` was removed and `MVTec_AD_2_poisson_*`
-# was renamed to `MVTec_AD_2_hybrid_*` to correct the earlier terminology -- what this
-# harness always called "poisson" (`P6`) was, per the notebook's own labeling, already
-# a poisson+alpha hybrid blend, not pure Poisson; there is now only one pregenerated
-# variant on disk. `P5` ("alpha") is therefore no longer resolvable and is not used
-# from phase 11 onward; `P6` now maps to the `hybrid` directory name.
-PREGENERATED_PIPELINES = {"P6": "hybrid", "P7": "anomalyany", "P8": "anostyler"}
+# As of the 2026-08-25 regeneration (`flash-part1.ipynb`), the on-disk directories use
+# `hybrid` for FLASH and `anostyler` for AnoStyler.
+PREGENERATED_PIPELINES = {"FLASH": "hybrid", "AnoStyler": "anostyler"}
+CALIBRATION_SOURCES = {
+    "-": "Real",
+    "Perlin": "Perlin",
+    "FLASH": "FLASH",
+    "AnoStyler": "AnoStyler",
+}
+CALIBRATION_PIPELINES = {
+    source: source for source in CALIBRATION_SOURCES.values() if source != "Real"
+}
 # The generation notebook regenerated SynthetciGenMVAD2 in place with a
 # donor bank covering all 8 MVTec AD 2 categories (was 4: rice/walnuts/wallplugs/
 # fruit_jelly, from the earlier `semantic_bank_blend.ipynb` pipeline) -- 3 donor pairs
@@ -144,7 +120,7 @@ SYNTHETIC_GEN_ROOT = EVAL_DATA_ROOT / "SynthetciGenMVAD2"
 # range by subtracting 1 in ``_pregenerated_eval_set``.
 PREGENERATED_SEEDS = (0, 1, 2)
 # Backbone for the SuperADD MVTec AD 2 sweep. `large` (303M params) was used as a
-# lighter pilot to validate the pipeline (see phase7); this is now the paper's actual
+# lighter pilot to validate the pipeline; this is now the paper's actual
 # `huge_plus` (840M) config. Verified via an isolated memory/timing test: batch=4 at
 # 448x448 peaks at ~4.1 GB GPU memory across a full train-forward + subsample_embedding
 # + inference cycle -- comfortably fits alongside another concurrent job per GPU.
@@ -180,18 +156,18 @@ DEFAULT_BATCH = 8
 class JobConfig:
     """Configuration for a single training job.
 
-    One job trains a model once and emits several result rows: arm A (oracle) plus
-    arm B for each pipeline (and arm C for each pipeline when ``include_c`` is set).
+    One job trains a model once and emits a Real calibration row plus one row for each
+    synthetic calibration source. It can also emit optional synthetic-set diagnostics.
 
     Args:
-        phase (str): Sweep phase this job belongs to.
+        experiment (str): Named comparison this job belongs to.
         dataset (str): Dataset key (``"mvtec"`` or ``"visa"``).
         category (str): Category within the dataset.
         model (str): Model name.
         seed (int): Random seed for the datamodule and synthetic sampling.
-        pipelines (tuple[str, ...]): Synthetic-anomaly pipeline ids to evaluate for arm B/C.
-        include_c (bool): Whether to also emit the diagnostic arm C.
-        calibration (str): Source of the negative (normal) samples in the arm-B/C
+        pipelines (tuple[str, ...]): Internal synthetic-source ids to evaluate.
+        include_diagnostic (bool): Whether to emit synthetic-set diagnostic rows.
+        calibration (str): Source of the negative (normal) samples in the synthetic
             calibration set. ``"test_normals"`` reuses the real test normals, which
             leaks: the threshold is fitted not to flag the very images it is then
             evaluated on. ``"heldout"`` instead draws them from a normal pool that is
@@ -200,20 +176,20 @@ class JobConfig:
             SuperADD). ``None`` keeps the model's default (huge_plus for SuperADD).
     """
 
-    phase: str
+    experiment: str
     dataset: str
     category: str
     model: str
     seed: int = 1
     pipelines: tuple[str, ...] = ("P1", "P2", "P3")
-    include_c: bool = False
+    include_diagnostic: bool = False
     calibration: str = "test_normals"
     backbone: str | None = None
 
     @property
     def key(self) -> str:
         """Unique, filesystem-safe identifier for this job."""
-        parts = [self.phase, self.dataset, self.category, self.model]
+        parts = [self.experiment, self.dataset, self.category, self.model]
         if self.backbone:
             parts.append(self.backbone)
         parts.append(f"s{self.seed}")
@@ -293,10 +269,8 @@ def build_model(
         # specifically because that adaptive threshold degenerates to the max
         # validation score on datasets whose validation split is normal-only (like
         # MVTec AD 2) -- see SuperADDPostProcessor's docstring. Force the standard
-        # F1AdaptiveThreshold-based PostProcessor instead so arms A/B/C are computed
-        # identically to the other 6 models (apples-to-apples comparison); SuperADD's
-        # own built-in threshold is a candidate follow-up "arm D" but is not wired in
-        # here.
+        # F1AdaptiveThreshold-based PostProcessor instead so all calibration settings
+        # use the same thresholding rule (apples-to-apples comparison).
         kwargs["post_processor"] = PostProcessor()
         kwargs["backbone"] = backbone or SUPERADD_BACKBONE
     if name == "anomaly_dino":
@@ -321,11 +295,11 @@ def build_model(
             # Under tiled inference each tile is already exactly `resolution` (448x448)
             # and anomalib's `Tiler.untile()` expects the model to return a map the same
             # shape as its input tile -- but the 392px crop shrinks the output map to
-            # 392x392, corrupting the stitched map (confirmed: every dinomaly phase 6
+            # 392x392, corrupting the stitched map (confirmed: every Dinomaly tiled run
             # job crashed with a tensor-size mismatch when fitting the pixel threshold,
             # since the corrupted map's element count no longer matched the mask's).
             # Fix: pass crop_size == image_size so the crop is a no-op under tiling; the
-            # non-tiled 448 px path (phase 5) is unaffected since it never sets `tiled`.
+            # non-tiled 448 px path is unaffected since it never sets `tiled`.
             kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution, crop_size=resolution[0])
         else:
             # Use the model class's own factory: several models constrain their
@@ -375,12 +349,8 @@ def _transform_size(model: object, kind: type) -> tuple[int, int] | None:
 
 
 def make_generator(pipeline: str) -> SyntheticAnomalyGenerator | PerlinAnomalyGenerator:
-    """Build the synthetic-anomaly generator for a pipeline id.
-
-    ``"P0"`` returns anomalib's stock, unmodified ``PerlinAnomalyGenerator`` directly
-    (not our composable ``SyntheticAnomalyGenerator`` framework) -- see ``PIPELINES``.
-    """
-    if pipeline == "P0":
+    """Build the paper's live synthetic-anomaly generator."""
+    if pipeline == "Perlin":
         return PerlinAnomalyGenerator(
             anomaly_source_path=EVAL_DATA_ROOT / "dtd",
             probability=1.0,
@@ -450,7 +420,7 @@ def _pregenerated_eval_set(
         negatives (object): Normal-sample pool (e.g. the heldout ``validation/`` set);
             used as-is, matching :func:`_synthetic_eval_set`'s convention.
         category (str): MVTec AD 2 category; must be one of ``PREGENERATED_CATEGORIES``.
-        pipeline (str): One of ``PREGENERATED_PIPELINES`` (``"P6"``).
+        pipeline (str): One of ``PREGENERATED_PIPELINES`` (``"FLASH"`` or ``"AnoStyler"``).
         n_anomalies (int): Number of anomalous rows to keep (matches the real test
             anomaly count, for parity with the live-generator pipelines).
         seed (int): Sweep seed (1, 2, 3 convention); remapped onto the notebook's fixed
@@ -460,9 +430,9 @@ def _pregenerated_eval_set(
         FileNotFoundError: If no pre-generated images are found for this
             (category, pipeline, seed) combination.
     """
-    arm = PREGENERATED_PIPELINES[pipeline]
+    source_dir = PREGENERATED_PIPELINES[pipeline]
     gen_seed = PREGENERATED_SEEDS[(seed - 1) % len(PREGENERATED_SEEDS)]
-    root = SYNTHETIC_GEN_ROOT / f"MVTec_AD_2_{arm}_{gen_seed}" / category / "test_public"
+    root = SYNTHETIC_GEN_ROOT / f"MVTec_AD_2_{source_dir}_{gen_seed}" / category / "test_public"
     bad_dir, mask_dir = root / "bad", root / "ground_truth" / "bad"
     image_paths = sorted(bad_dir.glob("*.png"))
     if not image_paths:
@@ -486,10 +456,10 @@ def _pregenerated_eval_set(
     negative_samples["split"] = Split.VAL
     dataset = AnomalibDataset(augmentations=getattr(negatives, "augmentations", None))
     dataset.samples = pd.concat([negative_samples, anomalies], ignore_index=True)
-    # AnomalyAny (P7) emits image-only rows (no ``*_mask.png``). ``AnomalibDataset``
+    # A maskless synthetic source emits image-only rows (no ``*_mask.png``). ``AnomalibDataset``
     # would crash on ``read_mask(None)`` for an abnormal row in segmentation mode, so
     # fall back to classification when no masks are present. Pixel metrics on this set
-    # are then skipped (they are never evaluated on the synthetic rows anyway -- arm B
+    # are then skipped (they are never evaluated on the synthetic rows anyway -- transferred
     # transfers only the image threshold to the real test, which ships its own masks).
     has_masks = anomalies["mask_path"].notna().any()
     dataset.samples.attrs["task"] = "segmentation" if has_masks else "classification"
@@ -501,7 +471,7 @@ def build_datamodule(job: JobConfig) -> object:
 
     The model trains on all official train normals and validates on the full official
     test set (SAME_AS_TEST), so the fit-time threshold is the oracle F1-max. Synthetic
-    calibration sets for arms B/C are injected later in :func:`run_job`.
+    Synthetic calibration sets are injected later in :func:`run_job`.
 
     Datamodules that ship their own validation split (MVTec AD 2) do not accept
     ``val_split_mode``. For those the native split is stashed on
@@ -547,7 +517,7 @@ def _set_test_data(datamodule: object, dataset: object) -> None:
 
     ``MVTecAD2.test_dataloader`` dispatches on ``test_type`` and builds its loader from
     ``test_public_data`` rather than ``test_data``, so assigning only ``test_data``
-    would be silently ignored and arm C would duplicate arm B. Setting both keeps the
+    would be silently ignored and a diagnostic would duplicate the transferred result. Setting both keeps the
     swap effective without replacing the method (which would make the datamodule
     unpicklable for dataloader workers).
     """
@@ -557,7 +527,7 @@ def _set_test_data(datamodule: object, dataset: object) -> None:
 
 
 def _calibration_negatives(job: JobConfig, datamodule: object, test_normals: object) -> object:
-    """Pick the normal samples used as negatives in the arm-B/C calibration set.
+    """Pick the normal samples used as negatives in the synthetic calibration set.
 
     ``"heldout"`` requires a pool disjoint from the test set; it is the leakage-free
     option and is currently only available where the dataset ships one.
@@ -598,13 +568,13 @@ def _reset_metrics(model: object) -> None:
 
 
 def _reset_post_processor(model: object) -> None:
-    """Reset fitted threshold/normalization buffers so each arm refits from scratch.
+    """Reset fitted threshold/normalization buffers for a fresh calibration.
 
     ``PostProcessor.on_validation_epoch_end`` only overwrites a buffer when its metric
     was updated during *that* validation pass. A maskless calibration set (AnomalyAny,
-    P7) never updates the pixel-threshold metric, so without this reset the buffer
+    maskless calibration never updates the pixel-threshold metric, so without this reset the buffer
     silently retains the value fitted during ``engine.fit`` -- the *oracle* threshold,
-    fitted on the real test -- inflating arm-B pixel metrics. Resetting to NaN forces
+    fitted on the real test -- inflating transferred pixel metrics. Resetting to NaN forces
     either a clean refit (masked pipelines) or the well-defined midpoint-normalization
     fallback (maskless pipelines, ``_normalize`` uses ``(max + min) / 2``).
     """
@@ -625,7 +595,7 @@ def collect_raw_scores(model: object, dataset: object, batch_size: int = 8) -> d
     matches the real one, so the per-image scores are recorded separately. The model is
     invoked directly rather than through ``Engine.test`` so the scores bypass the
     post-processor: normalisation is pivoted on the fitted threshold, which differs
-    between arms and would make the distributions incomparable.
+    between calibration settings and would make the distributions incomparable.
 
     Args:
         model (object): A trained anomaly model exposing ``forward``.
@@ -664,8 +634,8 @@ def collect_raw_scores(model: object, dataset: object, batch_size: int = 8) -> d
 
 def _row(
     job: JobConfig,
-    arm: str,
-    pipeline: str,
+    calibration_source: str,
+    evaluation_set: str,
     metrics: dict[str, float],
     sizes: tuple[int, int, int],
     thresholds: tuple[float | None, float | None],
@@ -678,13 +648,13 @@ def _row(
     fit_seconds, test_seconds = timings
     resolution = effective_size
     return {
-        "phase": job.phase,
+        "experiment": job.experiment,
         "dataset": job.dataset,
         "category": job.category,
         "model": job.model,
         "backbone": job.backbone,
-        "pipeline": pipeline,
-        "arm": arm,
+        "calibration_source": calibration_source,
+        "evaluation_set": evaluation_set,
         "seed": job.seed,
         **metrics,
         "n_train": n_train,
@@ -702,11 +672,10 @@ def _row(
 
 
 def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
-    """Train one model once and evaluate every arm from that identical model.
+    """Train one model once and evaluate every calibration source from that model.
 
-    Returns one row for arm A (oracle threshold), one row for arm B per pipeline
-    (synthetic threshold transferred to the real test) and, when ``job.include_c``
-    is set, one row for arm C per pipeline (synthetic threshold on the synthetic set).
+    Returns one row for Real calibration, one row per synthetic source with its threshold
+    transferred to the real test, and optional synthetic-set diagnostic rows.
 
     Returns:
         tuple: ``(rows, scores)`` where ``scores`` maps ``"real_test"`` and each
@@ -736,13 +705,13 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
 
         rows: list[dict] = []
 
-        # Arm A: oracle threshold (from the fit-time real-test validation).
+        # Real calibration is the paper's oracle reference.
         _reset_metrics(model)
         start = time.time()
         results_a = engine.test(model=model, datamodule=datamodule, verbose=False)
         test_seconds = round(time.time() - start, 2)
         rows.append(
-            _row(job, "A", "-", _metrics(results_a), (n_train, n_real_test, n_real_test),
+            _row(job, "Real", "Real test set", _metrics(results_a), (n_train, n_real_test, n_real_test),
                  _thresholds(model), (fit_seconds, test_seconds), effective_size),
         )
 
@@ -778,32 +747,36 @@ def run_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
             n_calib = len(calibration)
             scores[pipeline] = collect_raw_scores(model, calibration, batch_size=eval_batch)
 
-            # Refit the threshold on the synthetic calibration set (arm B/C threshold).
+            calibration_source = CALIBRATION_SOURCES.get(pipeline, pipeline)
+
+            # Refit the threshold on the synthetic calibration set.
             datamodule.val_data = calibration
             _set_test_data(datamodule, real_test)
             _reset_metrics(model)
             _reset_post_processor(model)
             engine.validate(model=model, datamodule=datamodule, verbose=False)
 
-            # Arm B: synthetic-derived threshold transferred to the real test.
+            # Evaluate the synthetic-derived threshold on the real test set.
             _reset_metrics(model)
             start = time.time()
             results_b = engine.test(model=model, datamodule=datamodule, verbose=False)
             test_seconds = round(time.time() - start, 2)
             rows.append(
-                _row(job, "B", pipeline, _metrics(results_b), (n_train, n_calib, n_real_test),
+                _row(job, calibration_source, "Real test set", _metrics(results_b),
+                     (n_train, n_calib, n_real_test),
                      _thresholds(model), (fit_seconds, test_seconds), effective_size),
             )
 
-            if job.include_c:
-                # Arm C: same synthetic threshold, evaluated on the synthetic set itself.
+            if job.include_diagnostic:
+                # Diagnose how the same threshold behaves on its calibration set.
                 _set_test_data(datamodule, calibration)
                 _reset_metrics(model)
                 start = time.time()
                 results_c = engine.test(model=model, datamodule=datamodule, verbose=False)
                 test_seconds = round(time.time() - start, 2)
                 rows.append(
-                    _row(job, "C", pipeline, _metrics(results_c), (n_train, n_calib, n_calib),
+                    _row(job, calibration_source, "Synthetic calibration set", _metrics(results_c),
+                         (n_train, n_calib, n_calib),
                          _thresholds(model), (fit_seconds, test_seconds), effective_size),
                 )
                 _set_test_data(datamodule, real_test)

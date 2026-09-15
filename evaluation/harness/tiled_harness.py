@@ -42,6 +42,7 @@ from anomalib.metrics import F1AdaptiveThreshold
 from torchvision.transforms.v2 import RandomCrop
 
 from .harness import (
+    CALIBRATION_SOURCES,
     DEFAULT_BATCH,
     MODEL_EVAL_BATCH,
     MODEL_TRAINER,
@@ -350,7 +351,7 @@ def _evaluate(
 def run_tiled_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]]]:
     """Train at native resolution (random-crop augmented) and evaluate with tiled inference.
 
-    Mirrors :func:`harness.run_job`'s arm structure (A/B/C) but every evaluation is a
+    Mirrors :func:`harness.run_job`'s calibration settings but every evaluation is a
     manual tiled scoring pass rather than ``Engine.test``/``Engine.validate``.
     """
     model = build_model(job.model, TILE_SIZE, tiled=True)
@@ -398,8 +399,8 @@ def run_tiled_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]
         real_records, image_threshold_a, pixel_threshold_a, img_min_a, img_max_a, pix_min_a, pix_max_a,
     )
     rows.append({
-        "phase": job.phase, "dataset": job.dataset, "category": job.category, "model": job.model,
-        "pipeline": "-", "arm": "A", "seed": job.seed,
+        "experiment": job.experiment, "dataset": job.dataset, "category": job.category, "model": job.model,
+        "calibration_source": "Real", "evaluation_set": "Real test set", "seed": job.seed,
         **metrics_a,
         "n_train": n_train, "n_val": n_real_test, "n_test": n_real_test,
         "image_threshold": image_threshold_a, "normalized_image_threshold": None,
@@ -444,8 +445,12 @@ def run_tiled_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]
             real_records, image_threshold_b, pixel_threshold_b, img_min_b, img_max_b, pix_min_b, pix_max_b,
         )
         rows.append({
-            "phase": job.phase, "dataset": job.dataset, "category": job.category, "model": job.model,
-            "pipeline": pipeline, "arm": "B", "seed": job.seed,
+            "experiment": job.experiment,
+            "dataset": job.dataset,
+            "category": job.category,
+            "model": job.model,
+            "calibration_source": CALIBRATION_SOURCES.get(pipeline, pipeline),
+            "evaluation_set": "Real test set", "seed": job.seed,
             **metrics_b,
             "n_train": n_train, "n_val": n_calib, "n_test": n_real_test,
             "image_threshold": image_threshold_b, "normalized_image_threshold": None,
@@ -453,7 +458,7 @@ def run_tiled_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]
             "fit_seconds": fit_seconds, "test_seconds": calib_seconds,
         })
 
-        if job.include_c:
+        if job.include_diagnostic:
             metrics_c = _evaluate(
                 calib_records,
                 image_threshold_b,
@@ -464,8 +469,12 @@ def run_tiled_job(job: JobConfig) -> tuple[list[dict], dict[str, dict[str, list]
                 pix_max_b,
             )
             rows.append({
-                "phase": job.phase, "dataset": job.dataset, "category": job.category, "model": job.model,
-                "pipeline": pipeline, "arm": "C", "seed": job.seed,
+                "experiment": job.experiment,
+                "dataset": job.dataset,
+                "category": job.category,
+                "model": job.model,
+                "calibration_source": CALIBRATION_SOURCES.get(pipeline, pipeline),
+                "evaluation_set": "Synthetic calibration set", "seed": job.seed,
                 **metrics_c,
                 "n_train": n_train, "n_val": n_calib, "n_test": n_calib,
                 "image_threshold": image_threshold_b, "normalized_image_threshold": None,

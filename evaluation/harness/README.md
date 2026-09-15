@@ -7,16 +7,11 @@ measures how well a threshold calibrated on synthetic anomalies transfers to rea
 test anomalies.
 
 The published comparison uses five detectors across eight MVTec AD 2 categories and three
-seeds:
-
-- `phase11_clean_baseline`: SuperADD, PaDiM, PatchCore and AnomalyDINO; Perlin (`P0`) and
-  FLASH hybrid (`P6`).
-- `phase14_anostyler`: the same four detectors; Perlin (`P0`) and AnoStyler (`P8`).
-- `phase15_dinomaly`: Dinomaly; Perlin (`P0`), FLASH hybrid (`P6`) and AnoStyler (`P8`).
-
-Arm A is the real-test oracle threshold. Arm B fits the threshold on held-out normals plus
-synthetic anomalies and transfers it to the real test set. Arm C is a diagnostic that evaluates
-the fitted threshold on the synthetic calibration set itself.
+seeds. The paper's Real setting is the oracle reference: its threshold is calibrated with
+real test anomalies. The Perlin, FLASH, and AnoStyler settings calibrate thresholds with
+held-out normals plus generated anomalies, then transfer those thresholds to the same real
+test set. The optional synthetic-set diagnostic is kept only to characterize calibration
+set difficulty; it is not a headline benchmark setting.
 
 ## Installation
 
@@ -62,17 +57,17 @@ above.
 
 ## Reproducing the runs
 
-From the repository root, set the data location and run the three final phases:
+From the repository root, set the data location and run the three paper comparisons:
 
 ```bash
 export FLASH_EVAL_DATA_ROOT="$PWD/data/evaluation"
 
 python -m evaluation.harness.sweep \
-    --phase phase11_clean_baseline --gpus 0 1 --procs-per-gpu 1
+    --experiment cross_model_comparison --gpus 0 1 --procs-per-gpu 1
 python -m evaluation.harness.sweep \
-    --phase phase14_anostyler --gpus 0 1 --procs-per-gpu 1
+    --experiment anostyler_comparison --gpus 0 1 --procs-per-gpu 1
 python -m evaluation.harness.sweep \
-    --phase phase15_dinomaly --gpus 0 1 --procs-per-gpu 1
+    --experiment dinomaly_comparison --gpus 0 1 --procs-per-gpu 1
 ```
 
 Runs are resumable: completed jobs are stored as JSON under
@@ -86,18 +81,18 @@ For a small single-job smoke test:
 
 ```bash
 python -m evaluation.harness.run_one \
-    --phase phase11_clean_baseline \
+    --experiment cross_model_comparison \
     --dataset mvtec2 \
     --category rice \
     --model patchcore \
     --seed 1 \
-    --pipelines P0 \
+    --sources Perlin \
     --calibration heldout
 ```
 
 The reference aggregate containing only the rows used by the paper's final comparison is
-`evaluation/results/paper_table1_results.csv`. The phase-to-table mapping and the published
-summary statistics are documented in `paper_accuracy_results.md`.
+`evaluation/results/paper_table1_results.csv`. The comparison-to-table mapping and the
+published summary statistics are documented in `paper_accuracy_results.md`.
 
 ## Reproducibility boundary
 
