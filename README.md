@@ -171,10 +171,9 @@ baseline does not pay at all, a full category costs **112.8 s** against **1,348.
 the generative cost of FLASH is fixed per category, so every additional synthetic image is
 procedural.
 
-Full calibration-setting tables, including the diagnostic that evaluates the fitted threshold
-back on the synthetic set, are in
-[`evaluation/results/combined_results_8_categories.txt`](evaluation/results/combined_results_8_categories.txt),
-and the complete comparison tables are in the paper.
+Calibration tables are in
+[`evaluation/results/combined_results_8_categories.txt`](evaluation/results/combined_results_8_categories.txt);
+full comparisons are in the paper.
 
 ## Quickstart
 
@@ -296,21 +295,14 @@ flash/
 |   |   |-- 01_semantic_generation.md
 |   |   |-- 02_extraction_and_banking.md
 |   |   `-- 03_localisation_and_synthesis.md
-|   `-- paper/    # the paper
-|       |-- FLASH.pdf
-|       `-- README.md
+|   |-- paper/    # the paper
+|   |   |-- FLASH.pdf
+|   |   `-- README.md
+|   `-- reports/
+|       `-- FLASH_ A Reference-Free “Generate Once, Synthesize Many” Framework.pdf
 |-- evaluation/    # detector-side calibration study
-|   |-- harness/
-|   |   |-- __init__.py
-|   |   |-- harness.py
-|   |   |-- paper_accuracy_results.md
-|   |   |-- README.md
-|   |   |-- run_one.py
-|   |   |-- sweep.py
-|   |   `-- tiled_harness.py
 |   |-- results/
-|   |   |-- combined_results_8_categories.txt
-|   |   `-- paper_table1_results.csv
+|   |   `-- combined_results_8_categories.txt
 |   |-- flash_part1.ipynb
 |   `-- flash_part2.ipynb
 |-- notebooks/    # the pipeline, run in order
