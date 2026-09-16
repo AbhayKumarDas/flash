@@ -142,7 +142,7 @@ oracle** on SuperADD, and across five detectors of very different type, parametr
 feature-mapping, training-free and distillation-based, it recovers **91 to 98 % of the oracle**.
 It is the best synthetic source on **four of the five** detectors at the image level, and its
 mean image F1 of 77.3 % sits well ahead of Perlin at 67.7 % and AnoStyler at 55.0 %. At the pixel
-level it is best on three of the five and has the highest mean of the synthetic sources, 19.4 %
+level it is best on four of the five and has the highest mean of the synthetic sources, 21.8 %
 against 17.6 % for AnoStyler and 14.1 % for Perlin. On SuperADD it roughly doubles Perlin's pixel
 F1, 38.4 % against 19.4 %.
 
@@ -171,10 +171,9 @@ baseline does not pay at all, a full category costs **112.8 s** against **1,348.
 the generative cost of FLASH is fixed per category, so every additional synthetic image is
 procedural.
 
-Full per-arm tables, including the diagnostic arm that evaluates the fitted threshold back on the
-synthetic set, are in
-[`evaluation/results/combined_results_8_categories.txt`](evaluation/results/combined_results_8_categories.txt),
-and the complete comparison tables are in the paper.
+Calibration tables are in
+[`evaluation/results/combined_results_8_categories.txt`](evaluation/results/combined_results_8_categories.txt);
+full comparisons are in the paper.
 
 ## Quickstart
 
@@ -296,14 +295,20 @@ flash/
 |   |   |-- 01_semantic_generation.md
 |   |   |-- 02_extraction_and_banking.md
 |   |   `-- 03_localisation_and_synthesis.md
-|   |-- paper/    # the paper
-|   |   |-- FLASH.pdf
-|   |   `-- README.md
-|   `-- reports/
-|       `-- FLASH_ A Reference-Free “Generate Once, Synthesize Many” Framework.pdf
+|   `-- paper/    # the paper
+|       |-- FLASH.pdf
+|       `-- README.md
 |-- evaluation/    # detector-side calibration study
+|   |-- harness/
+|   |   |-- __init__.py
+|   |   |-- harness.py
+|   |   |-- paper_accuracy_results.md
+|   |   |-- README.md
+|   |   |-- run_one.py
+|   |   `-- sweep.py
 |   |-- results/
-|   |   `-- combined_results_8_categories.txt
+|   |   |-- combined_results_8_categories.txt
+|   |   `-- paper_table1_results.csv
 |   |-- flash_part1.ipynb
 |   `-- flash_part2.ipynb
 |-- notebooks/    # the pipeline, run in order

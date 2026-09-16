@@ -1,11 +1,10 @@
-# The evaluation notebooks in evaluation/ only. Installs a full anomaly detection stack, which is
-# not needed to generate synthetic data.
+# Evaluation notebooks and paper-reproduction harness only.
 #
-# The SuperADD detector and its DINOv3 backbone are not on PyPI. The evaluation notebooks clone
-# and configure them at run time, so they are not listed here.
+# Pin anomalib to the commit used for the reported tables. It preserves the MVTec AD 2 split
+# and SuperADD implementation.
 
 -r requirements.txt
 
-anomalib>=1.0
+anomalib @ git+https://github.com/rajeshgangireddy/anomalib.git@0e6107dc51bf803ae6ae522fa2fb37baf463b6ac
 timm>=1.0
 scikit-learn>=1.3
