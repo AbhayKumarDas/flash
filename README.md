@@ -142,7 +142,7 @@ oracle** on SuperADD, and across five detectors of very different type, parametr
 feature-mapping, training-free and distillation-based, it recovers **91 to 98 % of the oracle**.
 It is the best synthetic source on **four of the five** detectors at the image level, and its
 mean image F1 of 77.3 % sits well ahead of Perlin at 67.7 % and AnoStyler at 55.0 %. At the pixel
-level it is best on three of the five and has the highest mean of the synthetic sources, 19.4 %
+level it is best on four of the five and has the highest mean of the synthetic sources, 21.8 %
 against 17.6 % for AnoStyler and 14.1 % for Perlin. On SuperADD it roughly doubles Perlin's pixel
 F1, 38.4 % against 19.4 %.
 
@@ -305,8 +305,7 @@ flash/
 |   |   |-- paper_accuracy_results.md
 |   |   |-- README.md
 |   |   |-- run_one.py
-|   |   |-- sweep.py
-|   |   `-- tiled_harness.py
+|   |   `-- sweep.py
 |   |-- results/
 |   |   |-- combined_results_8_categories.txt
 |   |   `-- paper_table1_results.csv

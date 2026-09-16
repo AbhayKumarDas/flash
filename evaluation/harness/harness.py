@@ -21,7 +21,6 @@ import torch
 from anomalib.data import MVTecAD, MVTecAD2, Visa
 from anomalib.data.datasets.base.image import AnomalibDataset
 from anomalib.data.utils import Split, ValSplitMode, split_by_label
-from anomalib.data.utils.generators import SyntheticAnomalyGenerator
 from anomalib.data.utils.generators.perlin import PerlinAnomalyGenerator
 from anomalib.data.utils.synthetic import SyntheticAnomalyDataset
 from anomalib.engine import Engine
@@ -70,9 +69,6 @@ RESOLUTIONS: dict[str, tuple[int, int] | None] = {
     "visa": None,
     "mvtec2": (448, 448),
 }
-
-# Live synthetic baseline.
-PIPELINES = {"Perlin": None}
 
 # Pre-generated calibration sources.
 PREGENERATED_PIPELINES = {"FLASH": "hybrid", "AnoStyler": "anostyler"}
@@ -178,7 +174,6 @@ def build_model(
     name: str,
     resolution: tuple[int, int] | None = None,
     *,
-    tiled: bool = False,
     backbone: str | None = None,
 ) -> object:
     """Instantiate a detector with the evaluation metrics.
@@ -186,7 +181,6 @@ def build_model(
     Args:
         name (str): Model key.
         resolution (tuple[int, int] | None): Requested input size.
-        tiled (bool): Whether tiled inference is used.
         backbone (str | None): Optional backbone override.
 
     Raises:
@@ -213,11 +207,7 @@ def build_model(
         kwargs["coreset_subsampling"] = True
         kwargs["sampling_ratio"] = 0.1
     if resolution is not None:
-        if name == "dinomaly" and tiled:
-            # Disable Dinomaly's center crop so tile and map sizes match.
-            kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution, crop_size=resolution[0])
-        else:
-            kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution)
+        kwargs["pre_processor"] = model_cls.configure_pre_processor(resolution)
     model = model_cls(**kwargs)
     if resolution is not None:
         requested = _resize_size(model)
@@ -253,16 +243,16 @@ def _transform_size(model: object, kind: type) -> tuple[int, int] | None:
     return found
 
 
-def make_generator(pipeline: str) -> SyntheticAnomalyGenerator | PerlinAnomalyGenerator:
+def make_generator(pipeline: str) -> PerlinAnomalyGenerator:
     """Build the paper's live synthetic-anomaly generator."""
-    if pipeline == "Perlin":
-        return PerlinAnomalyGenerator(
-            anomaly_source_path=EVAL_DATA_ROOT / "dtd",
-            probability=1.0,
-            blend_factor=(0.01, 0.2),
-        )
-    preset, overrides = PIPELINES[pipeline]
-    return SyntheticAnomalyGenerator.from_preset(preset, probability=1.0, **overrides)
+    if pipeline != "Perlin":
+        msg = f"Unsupported live pipeline: {pipeline!r}"
+        raise ValueError(msg)
+    return PerlinAnomalyGenerator(
+        anomaly_source_path=EVAL_DATA_ROOT / "dtd",
+        probability=1.0,
+        blend_factor=(0.01, 0.2),
+    )
 
 
 def _take_normals(dataset: object, count: int, seed: int) -> object:
@@ -282,7 +272,7 @@ def _synthetic_eval_set(
     negatives: object,
     source_normals: object,
     n_anomalies: int,
-    augmenter: SyntheticAnomalyGenerator | PerlinAnomalyGenerator,
+    augmenter: PerlinAnomalyGenerator,
     seed: int,
 ) -> SyntheticAnomalyDataset:
     """Build an evaluation set from real normals and synthetic anomalies."""

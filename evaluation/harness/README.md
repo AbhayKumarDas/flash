@@ -74,7 +74,7 @@ python -m evaluation.harness.run_one \
 ```
 
 The paper rows are in `evaluation/results/paper_table1_results.csv`; the table mapping is in
-`paper_accuracy_results.md`.
+`evaluation/harness/paper_accuracy_results.md`.
 
 ## Reproducibility boundary
 

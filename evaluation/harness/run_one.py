@@ -18,7 +18,6 @@ import json
 from pathlib import Path
 
 from evaluation.harness.harness import CALIBRATION_PIPELINES, JobConfig, run_job
-from evaluation.harness.tiled_harness import run_tiled_job
 
 RAW_DIR = Path(__file__).parent / "results" / "raw"
 SCORES_DIR = Path(__file__).parent / "results" / "scores"
@@ -51,14 +50,6 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Backbone override for models that accept one (e.g. SuperADD).",
     )
-    parser.add_argument(
-        "--tiled",
-        action="store_true",
-        help=(
-            "Train on native-resolution random crops and evaluate with tiled inference "
-            "(anomalib's Tiler) instead of a single whole-image resize. See tiled_harness.py."
-        ),
-    )
     return parser.parse_args()
 
 
@@ -83,7 +74,7 @@ def main() -> None:
         print(f"[skip] {job.key}")
         return
 
-    rows, scores = (run_tiled_job if args.tiled else run_job)(job)
+    rows, scores = run_job(job)
     out_path.write_text(json.dumps(rows, indent=2))
     (SCORES_DIR / f"{job.key}.json").write_text(json.dumps(scores))
     print(f"[done] {job.key} ({len(rows)} rows)")

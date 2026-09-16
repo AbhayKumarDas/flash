@@ -161,8 +161,6 @@ def run_job(config: JobConfig, gpu: int, cpu_threads: int | None = None) -> None
         cmd.append("--include-diagnostic")
     if config.backbone:
         cmd.extend(["--backbone", config.backbone])
-    if EXPERIMENTS[config.experiment].get("tiled", False):
-        cmd.append("--tiled")
     subprocess.run(cmd, env=env, check=False)  # noqa: S603  # fixed internal command, no shell
 
 
