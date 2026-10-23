@@ -98,7 +98,7 @@ the image, because it was measured from it.
 |:--:|:--:|:--|
 | **1** | 1 | A VLM reasons over a normal image to specify a plausible defect, its material context and its appearance, under hard constraints that preserve exposure, contrast, white balance, shadows and reflections. An image-generation model renders the anomaly image. |
 | **2** | 2 | **DiffMask** registers the normal against the generated anomaly (similarity search, ECC refinement, feature-based fallback, dense-flow correction), matches them photometrically, fuses five residual cues into a difference score, and converts it to a mask through a local z-score, hysteresis thresholding and direction-matched completion. |
-| **2** | 3 | Each recovered crop is judged by a second VLM pass and a substrate contrast gate. Accepted crops enter a category-wise semantic defect bank, indexed by category and defect type. |
+| **2** | 3 | Each recovered crop is judged by a second VLM pass and a substrate contrast gate. Accepted crops enter a category-wise semantic defect bank, indexed by category and defect type. The 02b notebook adds a human review of VLM rejections, which the paper does not describe. |
 | **3** | 4 | **OBS** estimates the foreground region of a fresh normal host from a CIELAB colour-distance cue OR'd with a local texture cue. **MRSP** builds a 1/f^alpha multi-resolution noise field and thresholds it at a quantile computed inside that region, so the target coverage is relative to the object rather than the frame. |
 | **3** | 5 | The retrieved defect is scaled and oriented to the placement blob, harmonized against the host substrate in CIELAB, and composited by hybrid blending: feathered alpha for small placements, Poisson with a substrate collar for large ones. |
 
@@ -195,6 +195,7 @@ output from `data/`, so any module can be re-run on its own without repeating th
 |:--:|:--|:--|:--|
 | 1 | [`01_semantic_generation.ipynb`](notebooks/01_semantic_generation.ipynb) | MVTec AD 2 normal images | anomaly prompts, then generated anomaly images |
 | 2 | [`02_extraction_and_banking.ipynb`](notebooks/02_extraction_and_banking.ipynb) | normal and anomaly pairs | validated defect bank, plus masks and overlays |
+| 2b | [`02b_defect_bank_ablation.ipynb`](notebooks/02b_defect_bank_ablation.ipynb) | normal and anomaly pairs (rice, fruit_jelly, walnuts) | defect bank with a human review of VLM rejections, for the bank-size ablation |
 | 3 | [`03_localisation_and_synthesis.ipynb`](notebooks/03_localisation_and_synthesis.ipynb) | defect bank and fresh normal hosts | synthetic anomalies with ground-truth masks |
 
 Dataset and model attachment instructions are in
@@ -309,6 +310,7 @@ flash/
 |-- notebooks/    # the pipeline, run in order
 |   |-- 01_semantic_generation.ipynb    # Stage 1
 |   |-- 02_extraction_and_banking.ipynb    # Stages 2 and 3
+|   |-- 02b_defect_bank_ablation.ipynb    # Stages 2 and 3, with human review of VLM rejections
 |   `-- 03_localisation_and_synthesis.ipynb    # Stages 4 and 5
 |-- src/
 |   `-- flash/    # operators the notebooks import
